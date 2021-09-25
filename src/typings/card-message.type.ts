@@ -1,5 +1,5 @@
 import { ColorResolvable } from 'discord.js'
-import { Null } from '@typings/generic.type'
+import { Null } from './generic.type'
 
 export interface CardMusic {
   title: string
