@@ -127,7 +127,7 @@ class QueueService {
           }
         }, 1000)
 
-        stream.once('error', (d) => {
+        this.player.on('error', (d) => {
           this.logger.error(d, d.stack)
           this.resetTime()
           this.skip()

@@ -13,12 +13,16 @@ class ClientService {
       intents: [
         Discord.Intents.FLAGS.GUILDS,
         Discord.Intents.FLAGS.GUILD_MESSAGES,
-        Discord.Intents.FLAGS.GUILD_VOICE_STATES
+        Discord.Intents.FLAGS.GUILD_VOICE_STATES,
+        Discord.Intents.FLAGS.GUILD_MESSAGE_REACTIONS
       ]
     })
 
-    this.client.once('ready', () => {
+    this.client.once('ready', (e) => {
       this.logger.log('Ready!')
+      e.user.setPresence({
+        activities: [{ name: 'Só as marcantes', type: 'PLAYING' }]
+      })
     })
 
     this.client.once('reconnecting', () => {
