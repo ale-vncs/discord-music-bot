@@ -11,7 +11,6 @@ import ResumeStrategy from '@app/services/commands/resume.strategy'
 import DisconnectStrategy from '@app/services/commands/disconnect.strategy'
 import QueueStrategy from '@app/services/commands/queue.strategy'
 import ClearStrategy from '@app/services/commands/clear.strategy'
-import BomDiaStrategy from '@app/services/commands/bom-dia.strategy'
 import QueueService from '@app/services/queue.service'
 import RemoveMusicStrategy from '@app/services/commands/remove-music.strategy'
 import RepeatStrategy from '@app/services/commands/repeat.strategy'
@@ -40,7 +39,7 @@ class CommandsService {
     const message = this.message
     const { content } = message
     this.logger.debug(JSON.stringify(message))
-    this.logger.info(`Conteudo da mensagem: ${content}`)
+    this.logger.info(`Conteúdo da mensagem: ${content}`)
     if (!this.isValidateMessage()) return
     const commandMessage = this.getCommand(this.prefix)
     this.command = this.getStrategyOrUndefined(commandMessage)
@@ -77,7 +76,6 @@ class CommandsService {
       dc: new DisconnectStrategy(),
       q: new QueueStrategy(),
       clear: new ClearStrategy(),
-      bomDia: new BomDiaStrategy(),
       rm: new RemoveMusicStrategy(),
       repeat: new RepeatStrategy()
     }
