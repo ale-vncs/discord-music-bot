@@ -76,7 +76,8 @@ addCommand({
 addCommand({
   alias: ['rm', 'remove'],
   strategy: RemoveMusicStrategy,
-  description: 'Remove uma música da lista'
+  description: 'Remove uma música da lista',
+  params: [{ name: 'songId', type: 'number', description: 'posição-música' }]
 })
 
 addCommand({
