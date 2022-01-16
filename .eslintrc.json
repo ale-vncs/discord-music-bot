@@ -1,7 +1,8 @@
 {
     "env": {
         "es2021": true,
-        "node": true
+        "node": true,
+        "jest": true
     },
     "extends": [
         "standard",
@@ -10,15 +11,21 @@
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 12,
+        "ecmaVersion": 2021,
         "sourceType": "module"
     },
     "plugins": [
         "@typescript-eslint",
-        "prettier"
+        "prettier",
+        "jest"
     ],
     "rules": {
-        "@typescript-eslint/explicit-module-boundary-types": "off",
-        "no-useless-constructor": "off"
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-explicit-any": "off",
+        "no-useless-constructor": "off",
+        "prettier/prettier": ["error", {
+            "endOfLine": "auto"
+        }]
     }
 }
