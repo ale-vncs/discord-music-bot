@@ -1,6 +1,6 @@
 import { MessageEmbedOptions } from 'discord.js'
-import { CardMusic } from '@typings/card-message.type'
-import { CurrentSongData, SongData } from '@typings/queue.type'
+import { CardMusic } from '@typings/card-message.typing'
+import { CurrentSongData, SongData } from '@typings/queue.typing'
 import { secondsToDisplayTime } from './converts.util'
 
 const makeCardMessage = (msg: string) => {
