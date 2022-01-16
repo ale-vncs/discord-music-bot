@@ -13,9 +13,7 @@ export class QueueStrategy extends AbstractCommandStrategy {
     const songlist = [...this.getSongManager().getListSong()]
     if (songlist.length) {
       const page = this.getPage(message.content)
-      message.channel.send({
-        embeds: [makeCardSongList(songlist, page)]
-      })
+      this.sendEmbedMessage([makeCardSongList(songlist, page)])
     } else {
       this.sendMessage('Não há músicas')
     }

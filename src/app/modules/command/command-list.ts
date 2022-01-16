@@ -11,65 +11,90 @@ import { ClearStrategy } from '@modules/command/strategy/clear.strategy'
 import { RemoveMusicStrategy } from '@modules/command/strategy/remove-music.strategy'
 import { RepeatStrategy } from '@modules/command/strategy/repeat.strategy'
 import { PlaylistStrategy } from '@modules/command/strategy/playlist.strategy'
+import { HelpStrategy } from '@modules/command/strategy/help.strategy'
 
-const addStrategy = StrategyBuilder.addCommand
+const addCommand = StrategyBuilder.addCommand
 
-addStrategy({
+addCommand({
   alias: ['play', 'p'],
-  strategy: PlayStrategy
+  strategy: PlayStrategy,
+  description: 'Toca a música ou adiciona na lista',
+  requiredParam: true,
+  params: [{ name: 'wordOrUrl', description: 'nome-ou-url-youtube' }]
 })
 
-addStrategy({
+addCommand({
   alias: ['join'],
-  strategy: JoinStrategy
+  strategy: JoinStrategy,
+  description: 'Convida o Ricardo para entrar na sua sala atual'
 })
 
-addStrategy({
+addCommand({
   alias: ['np', 'now-playing'],
-  strategy: NowPlayingStrategy
+  strategy: NowPlayingStrategy,
+  description: 'Mostra informações da música atual'
 })
 
-addStrategy({
+addCommand({
   alias: ['fs', 'force-skip'],
-  strategy: ForceSkipStrategy
+  strategy: ForceSkipStrategy,
+  description: 'Pula para a próxima música'
 })
 
-addStrategy({
+addCommand({
   alias: ['pause', 'ps'],
-  strategy: PauseStrategy
+  strategy: PauseStrategy,
+  description: 'Pausa a música atual'
 })
 
-addStrategy({
+addCommand({
   alias: ['resume', 'rs'],
-  strategy: ResumeStrategy
+  strategy: ResumeStrategy,
+  description: 'Continua a reprodução da música se pausada'
 })
 
-addStrategy({
+addCommand({
   alias: ['dc', 'disconnect'],
-  strategy: DisconnectStrategy
+  strategy: DisconnectStrategy,
+  description: 'Desconecta o Ricardo da sala'
 })
 
-addStrategy({
+addCommand({
   alias: ['q', 'queue'],
-  strategy: QueueStrategy
+  strategy: QueueStrategy,
+  description: 'Lista as músicas que estão na lista',
+  requiredParam: false,
+  params: [{ name: 'page', description: 'página', type: 'number' }]
 })
 
-addStrategy({
-  alias: ['clear', 'c'],
-  strategy: ClearStrategy
+addCommand({
+  alias: ['clear', 'cl'],
+  strategy: ClearStrategy,
+  description: 'Limpa a lista de música'
 })
 
-addStrategy({
+addCommand({
   alias: ['rm', 'remove'],
-  strategy: RemoveMusicStrategy
+  strategy: RemoveMusicStrategy,
+  description: 'Remove uma música da lista'
 })
 
-addStrategy({
+addCommand({
   alias: ['repeat'],
-  strategy: RepeatStrategy
+  strategy: RepeatStrategy,
+  description: 'Ativa e desativa repetição da música atual'
 })
 
-addStrategy({
+addCommand({
   alias: ['playlist'],
-  strategy: PlaylistStrategy
+  strategy: PlaylistStrategy,
+  enabled: false
+})
+
+addCommand({
+  alias: ['h', 'help'],
+  strategy: HelpStrategy,
+  description: 'Lista de comando do Ricardo Music',
+  requiredParam: false,
+  params: [{ name: 'page', type: 'number', description: 'página' }]
 })

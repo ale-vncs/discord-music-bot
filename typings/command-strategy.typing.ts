@@ -4,9 +4,20 @@ import { DiscordService } from '@modules/discord/discord.service'
 import { ChannelService } from '@modules/discord/channel.service'
 import { PlayMusicService } from '@modules/discord/play-music.service'
 
+export type StrategyParamType = 'string' | 'number'
+
 export interface StrategyFactoryData {
   alias: string[]
+  description?: string
+  enabled?: boolean
+  params?: {
+    name: string
+    description?: string
+    type?: StrategyParamType
+  }[]
+  requiredParam?: boolean
   strategy: new (
+    params: any,
     logger: LoggerAbstract,
     discordService: DiscordService,
     channelService: ChannelService,

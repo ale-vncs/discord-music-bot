@@ -3,10 +3,12 @@ import { DiscordService } from '@modules/discord/discord.service'
 import { LoggerAbstract } from '@logger/logger.abstract'
 import { ChannelService } from '@modules/discord/channel.service'
 import { PlayMusicService } from '@modules/discord/play-music.service'
+import { MessageOptions } from 'discord.js'
 
 @Injectable()
-export abstract class AbstractCommandStrategy {
+export abstract class AbstractCommandStrategy<T = any> {
   constructor(
+    private params: T,
     protected logger: LoggerAbstract,
     protected discordService: DiscordService,
     protected channelService: ChannelService,
@@ -31,5 +33,13 @@ export abstract class AbstractCommandStrategy {
 
   protected sendMessage(text: string) {
     this.discordService.sendDefaultMessage(text)
+  }
+
+  protected sendEmbedMessage(embeds: MessageOptions['embeds']) {
+    this.discordService.sendEmbedMessage(embeds)
+  }
+
+  protected getParams(): T {
+    return this.params
   }
 }

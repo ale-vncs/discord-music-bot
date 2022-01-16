@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ContextService } from '@context/context.service'
-import { Message } from 'discord.js'
+import { Message, MessageOptions } from 'discord.js'
 import { makeCardMessage } from '@utils/card-messages.util'
 import { SongService } from '@modules/song/song.service'
 
@@ -13,7 +13,7 @@ export class DiscordService {
   }
 
   getMessageContent() {
-    return this.getMessage().content.split(/\s(.+)/)[1]
+    return this.getMessage().content.split(/\s(.+)/)[1] ?? ''
   }
 
   getSongManager() {
@@ -38,6 +38,12 @@ export class DiscordService {
   sendDefaultMessage(text: string) {
     const msg = makeCardMessage(text)
     this.getMessage().channel.send({ embeds: [msg] })
+  }
+
+  sendEmbedMessage(embeds: MessageOptions['embeds']) {
+    this.getMessage().channel.send({
+      embeds
+    })
   }
 
   getBotPrefix() {
