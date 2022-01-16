@@ -52,6 +52,30 @@ const makeCardMusic = (data: CardMusic) => {
   return logMessage
 }
 
+const makeCardHelp = (commandDescription: string[], currentPage = 0) => {
+  const { amountPage, pageSize, offset, page } = calculatePagination(
+    commandDescription,
+    currentPage,
+    5
+  )
+  const description: string[] = []
+
+  commandDescription.splice(offset, pageSize).forEach((desc) => {
+    description.push(desc)
+  })
+
+  const logMessage: MessageEmbedOptions = {
+    title: 'Comandos do Ricardo Music',
+    color: '#e75454',
+    description: buildDescription(description),
+    footer: {
+      text: `Página ${page + 1}/${amountPage}`
+    }
+  }
+
+  return logMessage
+}
+
 const makeCardNowPlaying = (data: CurrentSongData) => {
   const description = [
     `\`${buildProgressBar(data.elapsedTime, data.duration)}\``,
@@ -77,16 +101,14 @@ const makeCardNowPlaying = (data: CurrentSongData) => {
   return logMessage
 }
 
-const makeCardSongList = (data: SongData[], page = 0) => {
-  const pageSize = 10
+const makeCardSongList = (data: SongData[], currentPage = 0) => {
+  const { amountPage, amountData, pageSize, offset, page } =
+    calculatePagination(data, currentPage)
   const description: string[] = [buildMusicDetail(data[0])]
-  const amountPage = Math.ceil((data.length - 1) / pageSize)
-  const amountSong = data.length
+  const amountSong = amountData
   const totalTimeOfSong = data.reduce((sum, song) => sum + song.duration, 0)
-  if (page + 1 > amountPage) page = amountPage - 1
 
   data.shift()
-  const offset = page * pageSize
   data.splice(offset, pageSize).forEach((song, index) => {
     description.push(buildMusicDetail(song, index + offset))
   })
@@ -152,4 +174,25 @@ const buildProgressBar = (currentTime: number, endTime: number) => {
   return progressBar.join('')
 }
 
-export { makeCardMusic, makeCardNowPlaying, makeCardSongList, makeCardMessage }
+const calculatePagination = (data: any[], page: number, pageSize = 10) => {
+  const amountPage = Math.ceil((data.length - 1) / pageSize)
+  const amountData = data.length
+  if (page + 1 > amountPage) page = amountPage - 1
+  const offset = page * pageSize
+
+  return {
+    amountPage,
+    amountData,
+    offset,
+    pageSize,
+    page
+  }
+}
+
+export {
+  makeCardMusic,
+  makeCardNowPlaying,
+  makeCardSongList,
+  makeCardMessage,
+  makeCardHelp
+}

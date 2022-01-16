@@ -1,7 +1,6 @@
 import { Guild, Message } from 'discord.js'
 import { AbstractCommandStrategy } from './strategy/abstract-command.strategy'
 import { Undefined } from '@typings/generic.typing'
-import { SongManagerService } from '@modules/song/song-manager.service'
 import { CommandFactory } from './command.factory'
 import { Injectable } from '@nestjs/common'
 import { LoggerAbstract } from '@logger/logger.abstract'
@@ -21,22 +20,28 @@ export class CommandsService {
   ) {
     this.prefix = discordCtx.getBotPrefix()
     logger.setContext(CommandsService.name)
+    strategyFactory.checkAlias()
   }
 
   processMessage(message: Message) {
-    this.message = message
-    if (this.isBotMessageAndIgnore()) return
-    const { content } = message
-    this.logger.info('Mensagem recebida')
-    this.logger.debug('Mensagem: {}', JSON.stringify(message))
-    this.logger.info(`Conteúdo da mensagem: ${content}`)
+    try {
+      this.message = message
+      if (this.isBotMessageAndIgnore()) return
+      const { content } = message
+      this.logger.info('Mensagem recebida')
+      this.logger.debug('Mensagem: {}', JSON.stringify(message))
+      this.logger.info(`Conteúdo da mensagem: ${content}`)
 
-    if (!this.isValidateMessage()) return
-    const commandAlias = this.getCommandAlias(this.prefix)
-    const command = this.getCommandStrategyOrUndefined(commandAlias)
-    const queue = this.getQueueByGuild()
-    this.setSongManagerAndMessageInContext(queue)
-    this.executeCommand(command)
+      if (!this.isValidateMessage()) return
+      this.discordCtx.setMessageInContext(this.message)
+      const commandAlias = this.getCommandAlias(this.prefix)
+      const command = this.getCommandStrategyOrUndefined(commandAlias)
+      const queue = this.getQueueByGuild()
+      this.songService.setSongManagerInContext(queue)
+      this.executeCommand(command)
+    } catch (e) {
+      this.logger.error('Um error ocorreu ao executar comando: {}', e)
+    }
   }
 
   private executeCommand(command: Undefined<AbstractCommandStrategy>) {
@@ -59,11 +64,6 @@ export class CommandsService {
 
     this.logger.warn(`Nenhum strategy encontrado!`)
     return undefined
-  }
-
-  private setSongManagerAndMessageInContext(songManager: SongManagerService) {
-    this.discordCtx.setMessageInContext(this.message)
-    this.songService.setSongManagerInContext(songManager)
   }
 
   private getQueueByGuild() {

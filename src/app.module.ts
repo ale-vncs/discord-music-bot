@@ -13,10 +13,7 @@ import { ScheduleModule } from '@nestjs/schedule'
 import { AllExceptionsFilter } from '@filters/all-exceptions.filter'
 import { InitializerModule } from '@modules/initializer/initializer.module'
 import { CommandModule } from '@modules/command/command.module'
-import { SongModule } from '@modules/song/song.module'
 import { DiscordModule } from '@modules/discord/discord.module'
-import { ClientModule } from '@modules/client/client.module'
-import { PlaylistModule } from '@modules/playlist/playlist.module'
 
 @Module({
   controllers: [AppController],
@@ -43,10 +40,7 @@ import { PlaylistModule } from '@modules/playlist/playlist.module'
     DiscordModule,
     LoggerModule,
     InitializerModule,
-    CommandModule,
-    ClientModule,
-    SongModule,
-    PlaylistModule
+    CommandModule
   ]
 })
 export class AppModule {

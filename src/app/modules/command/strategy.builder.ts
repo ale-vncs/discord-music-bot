@@ -19,6 +19,17 @@ export class StrategyBuilder {
   }
 
   getStrategyList() {
-    return this.listStrategy
+    return this.listStrategy.filter((s) => s.enabled || s.enabled === undefined)
+  }
+
+  checkSameAlias() {
+    const aliasCheck: string[] = []
+
+    this.getStrategyList().forEach((l) => {
+      if (l.alias.some((d) => aliasCheck.includes(d))) {
+        throw new Error(`${l.strategy.name} tem um alias já em uso`)
+      }
+      aliasCheck.push(...l.alias)
+    })
   }
 }

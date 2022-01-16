@@ -1,20 +1,18 @@
 import { AbstractCommandStrategy } from './abstract-command.strategy'
 import { Injectable } from '@nestjs/common'
 
+interface RemoveMusicStrategyParams {
+  songId: number
+}
+
 @Injectable()
-export class RemoveMusicStrategy extends AbstractCommandStrategy {
+export class RemoveMusicStrategy extends AbstractCommandStrategy<RemoveMusicStrategyParams> {
   async init() {
     this.logger.setContext(RemoveMusicStrategy.name)
   }
 
   async processMessage() {
-    const message = this.getMessage()
-    const songIndex = this.getSongIndex(message.content)
-    if (songIndex === null) {
-      this.logger.error(`Index de música não permitido`)
-      this.sendMessage('Index da música está inválida')
-      return
-    }
+    const songIndex = this.getSongIndex()
     this.logger.info(`Removendo musica [ ${songIndex} ] da lista`)
     const removedMusic = this.getSongManager()
       .getListSong()
@@ -23,9 +21,8 @@ export class RemoveMusicStrategy extends AbstractCommandStrategy {
     this.sendMessage(`Música [ ${removedMusic[0].name} ] removida da lista`)
   }
 
-  private getSongIndex(text: string) {
-    const page = text.split(' ')[1]
-    const pageInt = parseInt(page) || -1
-    return pageInt > 0 ? pageInt : null
+  private getSongIndex() {
+    const { songId } = this.getParams()
+    return songId
   }
 }
