@@ -1,6 +1,5 @@
 import { MiddlewareConsumer, Module, Scope } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { ConfigModule } from '@nestjs/config'
 import { LoggerModule } from '@logger/logger.module'
 import { APP_FILTER } from '@nestjs/core'
 import { AppController } from './app.controller'
@@ -29,12 +28,6 @@ import { DiscordModule } from '@modules/discord/discord.module'
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       load: [systemConfig]
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) =>
-        config.get<TypeOrmModuleOptions>('database', { infer: true })
     }),
     ContextModule,
     DiscordModule,
