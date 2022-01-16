@@ -1,8 +1,10 @@
 # other
 .env
+*.iml
 
 # compiled output
 /dist
+/build
 /node_modules
 
 # Logs
@@ -22,6 +24,7 @@ lerna-debug.log*
 /.nyc_output
 
 # IDEs and editors
+/.vscode
 /.idea
 .project
 .classpath
@@ -29,10 +32,3 @@ lerna-debug.log*
 *.launch
 .settings/
 *.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
