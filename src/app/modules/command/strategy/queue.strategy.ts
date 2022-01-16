@@ -10,7 +10,7 @@ export class QueueStrategy extends AbstractCommandStrategy {
 
   async processMessage() {
     const message = this.getMessage()
-    const songlist = [...this.getQueue().getListSong()]
+    const songlist = [...this.getSongManager().getListSong()]
     if (songlist.length) {
       const page = this.getPage(message.content)
       message.channel.send({

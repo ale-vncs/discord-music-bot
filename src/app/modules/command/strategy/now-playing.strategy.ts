@@ -10,9 +10,9 @@ export class NowPlayingStrategy extends AbstractCommandStrategy {
   }
 
   async processMessage(): Promise<void> {
-    const status = this.getQueue().getStatus()
+    const status = this.getSongManager().getStatus()
     if (status === StatusEnum.PLAYING) {
-      const songData = this.getQueue().getCurrentSong()
+      const songData = this.getSongManager().getCurrentSong()
 
       const logMessage = makeCardNowPlaying(songData)
       this.getMessage().channel.send({ embeds: [logMessage] })

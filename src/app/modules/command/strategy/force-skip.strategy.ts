@@ -8,8 +8,8 @@ export class ForceSkipStrategy extends AbstractCommandStrategy {
   }
 
   async processMessage() {
-    const songList = this.getQueue().getListSong()
-    this.getQueue().skip()
+    const songList = this.getSongManager().getListSong()
+    this.getSongManager().skip()
     const msg =
       songList.length > 0
         ? ':fast_forward: Próxima música :thumbsup:'

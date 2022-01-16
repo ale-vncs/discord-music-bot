@@ -1,8 +1,8 @@
 import { Guild, Message } from 'discord.js'
-import { AbstractCommandStrategy } from '../commandStrategy/abstract-command.strategy'
+import { AbstractCommandStrategy } from './strategy/abstract-command.strategy'
 import { Undefined } from '@typings/generic.typing'
 import { SongManagerService } from '@modules/song/song-manager.service'
-import { StrategyFactory } from '../commandStrategy/strategy.factory'
+import { CommandFactory } from './command.factory'
 import { Injectable } from '@nestjs/common'
 import { LoggerAbstract } from '@logger/logger.abstract'
 import { DiscordService } from '@modules/discord/discord.service'
@@ -17,7 +17,7 @@ export class CommandsService {
     private logger: LoggerAbstract,
     private discordCtx: DiscordService,
     private songService: SongService,
-    private strategyFactory: StrategyFactory
+    private strategyFactory: CommandFactory
   ) {
     this.prefix = discordCtx.getBotPrefix()
     logger.setContext(CommandsService.name)

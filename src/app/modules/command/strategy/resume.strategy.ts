@@ -9,9 +9,9 @@ export class ResumeStrategy extends AbstractCommandStrategy {
   }
 
   async processMessage() {
-    if (this.getQueue().getStatus() === StatusEnum.MUSIC_PAUSED) {
+    if (this.getSongManager().getStatus() === StatusEnum.MUSIC_PAUSED) {
       this.sendMessage('Voltando a tocar')
-      this.getQueue().resume()
+      this.getSongManager().resume()
     }
   }
 }

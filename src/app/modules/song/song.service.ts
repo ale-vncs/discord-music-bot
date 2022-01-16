@@ -21,6 +21,10 @@ export class SongService {
     this.queueCtx.addSongManager(key, songManager)
   }
 
+  removeSongManager(key: string) {
+    this.queueCtx.removeSongManager(key)
+  }
+
   findSongManager(key: string) {
     return this.queueCtx.getQueueOrUndefinedByKey(key)
   }

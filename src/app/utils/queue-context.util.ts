@@ -5,31 +5,23 @@ export class QueueContextUtil {
   private listQueue: Map<string, SongManagerService>
 
   private constructor() {
+    QueueContextUtil.instance = this
     this.listQueue = new Map<string, SongManagerService>()
   }
 
   static getInstance() {
-    if (!QueueContextUtil.instance) {
-      QueueContextUtil.instance = new QueueContextUtil()
-    }
-    return QueueContextUtil.instance
+    return QueueContextUtil.instance ?? new QueueContextUtil()
   }
 
   addSongManager(key: string, service: SongManagerService) {
     this.listQueue.set(key, service)
   }
 
-  getQueueByKey(key: string) {
-    const queue = this.getQueueOrUndefinedByKey(key)
-    if (!queue) throw new Error(`Queue [ ${key} ] não encontrada`)
-    return queue
-  }
-
   getQueueOrUndefinedByKey(key: string) {
     return this.listQueue.get(key)
   }
 
-  getListQueue() {
-    return this.listQueue
+  removeSongManager(key: string) {
+    this.listQueue.delete(key)
   }
 }

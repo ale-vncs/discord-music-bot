@@ -16,7 +16,9 @@ export class RemoveMusicStrategy extends AbstractCommandStrategy {
       return
     }
     this.logger.info(`Removendo musica [ ${songIndex} ] da lista`)
-    const removedMusic = this.getQueue().getListSong().splice(songIndex, 1)
+    const removedMusic = this.getSongManager()
+      .getListSong()
+      .splice(songIndex, 1)
     this.logger.info(`Música [ ${removedMusic[0].name} ] removida com sucesso`)
     this.sendMessage(`Música [ ${removedMusic[0].name} ] removida da lista`)
   }

@@ -20,6 +20,11 @@ export class DiscordService {
     return this.songService.getCurrentSongManager()
   }
 
+  removeSongManager() {
+    const guildId = this.getMessage().guildId
+    if (guildId) this.songService.removeSongManager(guildId)
+  }
+
   setMessageInContext(message: Message) {
     this.ctx.setDataContext('discord', {
       message

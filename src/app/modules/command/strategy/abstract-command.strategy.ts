@@ -25,7 +25,7 @@ export abstract class AbstractCommandStrategy {
     return this.discordService.getMessageContent()
   }
 
-  protected getQueue() {
+  protected getSongManager() {
     return this.discordService.getSongManager()
   }
 

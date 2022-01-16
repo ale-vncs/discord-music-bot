@@ -8,7 +8,7 @@ export class ClearStrategy extends AbstractCommandStrategy {
   }
 
   async processMessage() {
-    this.getQueue().clearSongInQueue()
+    this.getSongManager().clearSongInQueue()
     this.sendMessage('A lista de música foi limpa')
   }
 }

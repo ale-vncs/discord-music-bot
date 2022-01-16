@@ -9,12 +9,14 @@ export class JoinStrategy extends AbstractCommandStrategy {
 
   async processMessage() {
     this.logger.info('Acessando informações do canal')
-    this.channelService.joinChannel()
-    const isJoin = this.channelService.isJoinChannel()
     const channelName = this.discordService.getChannelName()
-    const msg = isJoin
-      ? `Entrando no canal: ${channelName}`
-      : `Já estou no canal: ${channelName}`
-    this.sendMessage(msg)
+    const isJoin = this.channelService.isJoinChannel()
+
+    if (isJoin) {
+      this.sendMessage(`Já estou no canal: ${channelName}`)
+    } else {
+      this.channelService.joinChannel()
+      this.sendMessage(`Entrando no canal: ${channelName}`)
+    }
   }
 }
