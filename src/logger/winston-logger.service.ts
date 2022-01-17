@@ -6,6 +6,7 @@ import { Null, NullOrUndefined, Undefined } from '@typings/generic.typing'
 import { LoggerAbstract } from './logger.abstract'
 import { systemConfig } from '@config/system.config'
 import { AppContextType, ContextKeys } from '@typings/context.typings'
+import DailyRotateFile from 'winston-daily-rotate-file'
 
 const { combine, timestamp, printf, colorize } = winston.format
 
@@ -27,7 +28,7 @@ type ColorType = keyof typeof colors
 @Injectable({ scope: Scope.TRANSIENT })
 export class WinstonLoggerService extends LoggerAbstract {
   private readonly logger: winston.Logger
-  private context: string = 'main'
+  private context = 'main'
   private ctx = ContextUtil.getInstance()
   private loggerParameter: Null<string>[] = []
 
@@ -35,6 +36,12 @@ export class WinstonLoggerService extends LoggerAbstract {
     super()
     this.logger = winston.createLogger({
       transports: [
+        new DailyRotateFile({
+          filename: './logs/file-%DATE%.log',
+          datePattern: 'DD_MM_yyyy',
+          maxFiles: '14d',
+          format: combine(timestamp(), this.fileFormat())
+        }),
         new winston.transports.Console({
           level: process.env.LOGGER_LEVEL || 'debug',
           format: combine(timestamp(), this.consoleFormat())
@@ -71,6 +78,19 @@ export class WinstonLoggerService extends LoggerAbstract {
       }
 
       return this.insertMessageAndBuild(level, message)
+    })
+  }
+
+  private fileFormat() {
+    return printf(({ level, message, timestamp }) => {
+      return JSON.stringify({
+        timestamp,
+        level,
+        id: this.getLoggerInfoFromContext('transactionId'),
+        method: this.getRequestInfoFromContext('method'),
+        url: this.getRequestInfoFromContext('originalUrl'),
+        message
+      })
     })
   }
 
