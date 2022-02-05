@@ -10,6 +10,6 @@ export class PlayStrategy extends AbstractCommandStrategy<string> {
   async processMessage() {
     this.channelService.joinChannel()
 
-    await this.playMusicService.searchAndPlayYoutubeMusic(this.getParam())
+    await this.playMusicService.searchAndPlayMusic(this.getParam())
   }
 }

@@ -115,11 +115,14 @@ export class SongManagerService {
         this.resetIdleCounter()
         this.resetTime()
         const currentSong = this.songs[0]
+
         const stream = ytdl(currentSong.url, {
           filter: 'audioonly',
           quality: 'highestaudio',
-          highWaterMark: 1048576 * 32
+          highWaterMark: 1 << 25,
+          dlChunkSize: 0
         })
+
         const resource = createAudioResource(stream)
 
         this.stream = stream
