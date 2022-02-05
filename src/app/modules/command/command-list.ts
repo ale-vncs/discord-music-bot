@@ -20,7 +20,7 @@ addCommand({
   strategy: PlayStrategy,
   description: 'Toca a música ou adiciona na lista',
   requiredParam: true,
-  params: [{ name: 'wordOrUrl', description: 'nome-ou-url-youtube' }]
+  params: { name: 'wordOrUrl', description: 'nome-ou-url-youtube' }
 })
 
 addCommand({
@@ -64,7 +64,7 @@ addCommand({
   strategy: QueueStrategy,
   description: 'Lista as músicas que estão na lista',
   requiredParam: false,
-  params: [{ name: 'page', description: 'página', type: 'number' }]
+  params: { name: 'page', description: 'página', type: 'number' }
 })
 
 addCommand({
@@ -77,7 +77,7 @@ addCommand({
   alias: ['rm', 'remove'],
   strategy: RemoveMusicStrategy,
   description: 'Remove uma música da lista',
-  params: [{ name: 'songId', type: 'number', description: 'posição-música' }]
+  params: { name: 'songId', type: 'number', description: 'posição-música' }
 })
 
 addCommand({
@@ -97,5 +97,5 @@ addCommand({
   strategy: HelpStrategy,
   description: 'Lista de comando do Ricardo Music',
   requiredParam: false,
-  params: [{ name: 'page', type: 'number', description: 'página' }]
+  params: { name: 'page', type: 'number', description: 'página' }
 })
