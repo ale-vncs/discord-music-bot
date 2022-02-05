@@ -30,11 +30,13 @@ export class SongManagerService {
   private status: StatusEnum
   private guild: Guild
   private repeatMode = false
+  private encoderArgs: Undefined<string[]>
 
   constructor(private logger: LoggerAbstract) {
     logger.setContext(SongManagerService.name)
     this.status = StatusEnum.IDLE
     this.stream = null
+    this.encoderArgs = undefined
     this.songs = []
     this.player = createAudioPlayer({
       behaviors: {
@@ -59,31 +61,31 @@ export class SongManagerService {
     return this
   }
 
-  public getStatus() {
+  getStatus() {
     return this.status
   }
 
-  public setStatus(status: StatusEnum) {
+  setStatus(status: StatusEnum) {
     this.status = status
   }
 
-  public setVoiceChannel(connection: VoiceConnection) {
+  setVoiceChannel(connection: VoiceConnection) {
     connection.subscribe(this.player)
     this.voiceChannel = connection
   }
 
-  public disconnectVoice() {
+  disconnectVoice() {
+    this.status = StatusEnum.IDLE
     this.clearSongList()
     this.stop()
-    this.status = StatusEnum.IDLE
     if (this.voiceChannel) return this.voiceChannel.disconnect()
   }
 
-  public clearSongList() {
+  clearSongList() {
     this.songs = []
   }
 
-  public getCurrentSong(): CurrentSongData {
+  getCurrentSong(): CurrentSongData {
     return {
       ...this.songs[0],
       elapsedTime: this.elapsedTime
@@ -97,6 +99,14 @@ export class SongManagerService {
   addSong(song: SongData) {
     this.logger.info(`Adicionando musica: ${song.name}`)
     this.songs.push(song)
+  }
+
+  setFilter(filters: string[]) {
+    this.encoderArgs = filters
+  }
+
+  clearFilter() {
+    this.encoderArgs = undefined
   }
 
   skip() {
@@ -121,7 +131,8 @@ export class SongManagerService {
           filter: 'audioonly',
           quality: 'highestaudio',
           highWaterMark: 1 << 25,
-          dlChunkSize: 0
+          dlChunkSize: 0,
+          encoderArgs: this.encoderArgs
         })
 
         const resource = createAudioResource(stream, {
@@ -184,6 +195,7 @@ export class SongManagerService {
   }
 
   private startIdleCounter() {
+    this.stop()
     this.idleCounter = setTimeout(() => {
       this.disconnectVoice()
       this.logger.info('Desconectado por inatividade')

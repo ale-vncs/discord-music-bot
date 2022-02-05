@@ -15,6 +15,7 @@ export interface StrategyFactoryData {
     description?: string
     type?: StrategyParamType
   }
+  eg?: string[]
   requiredParam?: boolean
   strategy: new (
     params: any,

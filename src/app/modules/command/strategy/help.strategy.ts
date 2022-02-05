@@ -32,8 +32,17 @@ export class HelpStrategy extends AbstractCommandStrategy<Null<number>> {
   private makeDescription(comm: StrategyFactoryData) {
     const alias = this.buildAlias(comm.alias, comm.params)
     const description = this.buildDescription(comm.description)
+    const examples = this.buildExample(comm.alias[0], comm.eg)
 
-    return `${alias}\n${description}`
+    const build = [alias, description, examples].filter(Boolean)
+
+    return build.join('\n')
+  }
+
+  private buildExample(alias: string, eg: Undefined<string[]>) {
+    if (!eg) return undefined
+    const build = eg.map((e) => `${this.prefix}${alias} ${e}`)
+    return `ex: ${build.join('\n ex: ')}`
   }
 
   private buildDescription(description: Undefined<string>) {
