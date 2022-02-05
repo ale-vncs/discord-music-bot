@@ -1,6 +1,7 @@
 import {
   ArgumentsHost,
   Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
   NotFoundException
@@ -8,17 +9,15 @@ import {
 import { ApiErrorException } from '@exceptions/api-error.exception'
 import { Response } from 'express'
 import { Null } from '@typings/generic.typing'
-import { BaseExceptionFilter } from '@nestjs/core'
 import { ResponseApi } from '@utils/result.util'
 import { ValidationErrorException } from '@exceptions/validation-error.exception'
 import { LoggerAbstract } from '@logger/logger.abstract'
 
 @Catch()
-export class AllExceptionsFilter extends BaseExceptionFilter {
+export class AllExceptionsFilter implements ExceptionFilter {
   private response: Null<Response> = null
 
   constructor(private logger: LoggerAbstract) {
-    super()
     logger.setContext(AllExceptionsFilter.name)
   }
 
