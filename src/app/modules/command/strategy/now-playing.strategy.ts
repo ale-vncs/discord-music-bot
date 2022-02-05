@@ -1,9 +1,7 @@
 import { AbstractCommandStrategy } from './abstract-command.strategy'
 import { makeCardNowPlaying } from '@utils/card-messages.util'
 import { StatusEnum } from '@enums/status.enum'
-import { Injectable } from '@nestjs/common'
 
-@Injectable()
 export class NowPlayingStrategy extends AbstractCommandStrategy {
   async init() {
     this.logger.setContext(NowPlayingStrategy.name)

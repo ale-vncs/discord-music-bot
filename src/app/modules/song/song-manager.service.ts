@@ -14,6 +14,7 @@ import { StatusEnum } from '@enums/status.enum'
 import { Guild } from 'discord.js'
 import { LoggerAbstract } from '@logger/logger.abstract'
 import { Injectable } from '@nestjs/common'
+import { getEncoderByFilterList } from '@utils/filters.util'
 
 @Injectable()
 export class SongManagerService {
@@ -109,6 +110,10 @@ export class SongManagerService {
     this.encoderArgs = undefined
   }
 
+  getFilters() {
+    return this.encoderArgs
+  }
+
   skip() {
     this.logger.info('Pulando para a proxima música')
     this.stop()
@@ -132,7 +137,7 @@ export class SongManagerService {
           quality: 'highestaudio',
           highWaterMark: 1 << 25,
           dlChunkSize: 0,
-          encoderArgs: this.encoderArgs
+          encoderArgs: this.getEncoder()
         })
 
         const resource = createAudioResource(stream, {
@@ -192,6 +197,12 @@ export class SongManagerService {
 
   getGuild() {
     return this.guild
+  }
+
+  private getEncoder() {
+    return this.encoderArgs
+      ? getEncoderByFilterList(this.encoderArgs)
+      : undefined
   }
 
   private startIdleCounter() {
