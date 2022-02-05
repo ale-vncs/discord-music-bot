@@ -133,7 +133,8 @@ export class SongManagerService {
         }, 1000)
 
         this.player.on('error', (d) => {
-          this.logger.error(d, d.stack)
+          this.logger.error('Error ao tocar musica: {}', currentSong.name)
+          this.logger.error('[ {} ]: {}', d.name, d.message)
           this.resetTime()
           this.skip()
         })
