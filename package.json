@@ -34,6 +34,7 @@
     "class-validator": "0.13.2",
     "cls-hooked": "4.2.2",
     "date-fns": "2.27.0",
+    "discord-ytdl-core": "^5.0.4",
     "discord.js": "13.6.0",
     "dotenv": "10.0.0",
     "dotenv-cli": "4.1.1",
@@ -45,12 +46,13 @@
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
     "rxjs": "7.5.2",
+    "spotify-url-info": "^2.2.5",
     "tweetnacl": "1.0.3",
     "typeorm": "0.2.41",
     "uuid": "8.3.2",
     "winston": "3.3.3",
     "winston-daily-rotate-file": "^4.5.5",
-    "ytdl-core": "4.10.0",
+    "ytdl-core": "^4.10.1",
     "ytsr": "3.6.0"
   },
   "devDependencies": {

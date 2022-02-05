@@ -1,12 +1,8 @@
 import { AbstractCommandStrategy } from './abstract-command.strategy'
 import { Injectable } from '@nestjs/common'
 
-interface RemoveMusicStrategyParams {
-  songId: number
-}
-
 @Injectable()
-export class RemoveMusicStrategy extends AbstractCommandStrategy<RemoveMusicStrategyParams> {
+export class RemoveMusicStrategy extends AbstractCommandStrategy<number> {
   async init() {
     this.logger.setContext(RemoveMusicStrategy.name)
   }
@@ -22,7 +18,6 @@ export class RemoveMusicStrategy extends AbstractCommandStrategy<RemoveMusicStra
   }
 
   private getSongIndex() {
-    const { songId } = this.getParams()
-    return songId
+    return this.getParam()
   }
 }

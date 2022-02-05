@@ -10,8 +10,5 @@ export class DisconnectStrategy extends AbstractCommandStrategy {
   async processMessage() {
     this.logger.info('Saindo do canal')
     this.getSongManager().disconnectVoice()
-
-    this.logger.info('Removendo songManager')
-    this.discordService.removeSongManager()
   }
 }

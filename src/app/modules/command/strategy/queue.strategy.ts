@@ -3,12 +3,8 @@ import { makeCardSongList } from '@utils/card-messages.util'
 import { Injectable } from '@nestjs/common'
 import { Null } from '@typings/generic.typing'
 
-interface QueueStrategyParams {
-  page: Null<number>
-}
-
 @Injectable()
-export class QueueStrategy extends AbstractCommandStrategy<QueueStrategyParams> {
+export class QueueStrategy extends AbstractCommandStrategy<Null<number>> {
   async init() {
     this.logger.setContext(QueueStrategy.name)
   }
@@ -24,7 +20,7 @@ export class QueueStrategy extends AbstractCommandStrategy<QueueStrategyParams> 
   }
 
   private getPage() {
-    const { page } = this.getParams()
+    const page = this.getParam()
     if (page) return page - 1
     return 0
   }

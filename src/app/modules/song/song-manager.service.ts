@@ -3,10 +3,11 @@ import {
   createAudioPlayer,
   createAudioResource,
   NoSubscriberBehavior,
+  StreamType,
   VoiceConnection
 } from '@discordjs/voice'
 import { Readable } from 'stream'
-import ytdl from 'ytdl-core'
+import ytdl from 'discord-ytdl-core'
 import { CurrentSongData, SongData } from '@typings/queue.typing'
 import { Null, Undefined } from '@typings/generic.typing'
 import { StatusEnum } from '@enums/status.enum'
@@ -115,12 +116,17 @@ export class SongManagerService {
         this.resetIdleCounter()
         this.resetTime()
         const currentSong = this.songs[0]
+
         const stream = ytdl(currentSong.url, {
           filter: 'audioonly',
           quality: 'highestaudio',
-          highWaterMark: 1048576 * 32
+          highWaterMark: 1 << 25,
+          dlChunkSize: 0
         })
-        const resource = createAudioResource(stream)
+
+        const resource = createAudioResource(stream, {
+          inputType: StreamType.Raw
+        })
 
         this.stream = stream
         this.logger.info(`Tocando musica: ${currentSong.name}`)
@@ -133,7 +139,8 @@ export class SongManagerService {
         }, 1000)
 
         this.player.on('error', (d) => {
-          this.logger.error(d, d.stack)
+          this.logger.error('Error ao tocar musica: {}', currentSong.name)
+          this.logger.error('[ {} ]: {}', d.name, d.message)
           this.resetTime()
           this.skip()
         })

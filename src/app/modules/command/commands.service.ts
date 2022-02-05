@@ -1,6 +1,5 @@
 import { Guild, Message } from 'discord.js'
 import { AbstractCommandStrategy } from './strategy/abstract-command.strategy'
-import { Undefined } from '@typings/generic.typing'
 import { CommandFactory } from './command.factory'
 import { Injectable } from '@nestjs/common'
 import { LoggerAbstract } from '@logger/logger.abstract'
@@ -24,29 +23,26 @@ export class CommandsService {
   }
 
   processMessage(message: Message) {
-    try {
-      this.message = message
-      if (this.isBotMessageAndIgnore()) return
-      const { content } = message
-      this.logger.info('Mensagem recebida')
-      this.logger.debug('Mensagem: {}', JSON.stringify(message))
-      this.logger.info(`Conteúdo da mensagem: ${content}`)
+    this.message = message
+    if (this.isBotMessageAndIgnore()) return
+    const { content } = message
+    this.logger.info('Mensagem recebida')
+    this.logger.debug('Mensagem: {}', JSON.stringify(message))
+    this.logger.info(`Conteúdo da mensagem: ${content}`)
 
-      if (!this.isValidateMessage()) return
-      this.discordCtx.setMessageInContext(this.message)
-      const commandAlias = this.getCommandAlias(this.prefix)
-      const command = this.getCommandStrategyOrUndefined(commandAlias)
-      const queue = this.getQueueByGuild()
-      this.songService.setSongManagerInContext(queue)
-      this.executeCommand(command)
-    } catch (e) {
-      this.logger.error('Um error ocorreu ao executar comando: {}', e)
-    }
+    if (!this.isValidateMessage()) return
+    this.discordCtx.setMessageInContext(this.message)
+    const commandAlias = this.getCommandAlias(this.prefix)
+    const command = this.getCommandStrategyOrUndefined(commandAlias)
+    const queue = this.getQueueByGuild()
+    this.songService.setSongManagerInContext(queue)
+    this.executeCommand(command)
   }
 
-  private executeCommand(command: Undefined<AbstractCommandStrategy>) {
-    command?.init()
-    command?.processMessage()
+  private async executeCommand(command: AbstractCommandStrategy) {
+    await command.init()
+    await command.processMessage()
+    this.logger.info('Comando executado com sucesso')
   }
 
   private getCommandAlias(prefix: string) {
@@ -62,8 +58,7 @@ export class CommandsService {
       return strategy
     }
 
-    this.logger.warn(`Nenhum strategy encontrado!`)
-    return undefined
+    throw new Error('Nenhum strategy encontrado!')
   }
 
   private getQueueByGuild() {

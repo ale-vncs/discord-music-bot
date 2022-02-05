@@ -1,10 +1,26 @@
-import { Message } from 'discord.js'
+import { MessageOptions } from 'discord.js'
 import ytdl from 'ytdl-core'
 import { makeCardMusic } from '@utils/card-messages.util'
 import ytsr from 'ytsr'
+import spotify from 'spotify-url-info'
 import { Injectable } from '@nestjs/common'
 import { LoggerAbstract } from '@logger/logger.abstract'
 import { DiscordService } from '@modules/discord/discord.service'
+import { SongData } from '@typings/queue.typing'
+
+interface RegexProvider {
+  provider: string[]
+  func: (search: string) => Promise<MessageOptions['embeds']>
+}
+
+interface BuildMessage {
+  title: string
+  musicUrl: string
+  songDuration: number
+  youtubeChannelName: string
+  imageUrl: string
+  source: SongData['source']
+}
 
 @Injectable()
 export class PlayMusicService {
@@ -15,73 +31,89 @@ export class PlayMusicService {
     logger.setContext(PlayMusicService.name)
   }
 
-  async searchAndPlayYoutubeMusic(searchWordOrLink: string) {
-    this.discordCtx.sendDefaultMessage(
-      `:musical_note: Pesquisando :mag_right: \`${searchWordOrLink}\``
-    )
-    try {
-      const result = await this.getYoutubeUrl(searchWordOrLink)
+  async searchAndPlayMusic(searchWordOrLink: string) {
+    if (!searchWordOrLink) {
+      this.logger.warn('Não há dados para buscar')
+      return null
+    }
 
-      if (!result) {
-        this.discordCtx.sendDefaultMessage(
-          '`Não foi possível encontrar referencias`'
-        )
-        return
+    try {
+      const regexProvider: RegexProvider[] = [
+        {
+          provider: ['https://open.spotify.com'],
+          func: this.searchAndPlaySpotifyMusic.bind(this)
+        },
+        {
+          provider: ['https://www.youtube.com', 'https://youtu.be'],
+          func: this.searchAndPlayYoutubeMusic.bind(this)
+        }
+      ]
+
+      let provider = regexProvider.find((rp) => {
+        const reg = new RegExp(rp.provider + '.*')
+        if (reg.test(searchWordOrLink)) return rp
+        return undefined
+      })
+
+      if (!provider) {
+        provider = regexProvider[1]
       }
 
-      const { url, search } = result
+      const message = await provider.func(searchWordOrLink)
 
-      const message = await this.playYouTubeMusic(
-        search,
-        url,
-        this.discordCtx.getMessage().author
-      )
-
-      this.discordCtx.getMessage().channel.send(message)
+      this.discordCtx.sendEmbedMessage(message)
     } catch (ex) {
-      this.logger.error('Um error ocorreu ao buscar musica no youtube')
-      this.logger.error(ex)
+      this.logger.error('Um error ocorreu ao buscar musica')
+      this.logger.error(ex.message)
       this.discordCtx.sendDefaultMessage(
         'Não foi possível tocar a música desejada'
       )
     }
   }
 
-  async playYouTubeMusic(
-    search: string,
-    url: string,
-    author: Message['author']
-  ): Promise<Parameters<Message['channel']['send']>['0']> {
+  private async searchAndPlaySpotifyMusic(
+    link: string
+  ): Promise<MessageOptions['embeds']> {
+    this.logger.info('Buscando musica do spotify')
+    const songData = await spotify.getPreview(link)
+
+    const songInfo = `${songData.title} - ${songData.artist}`
+
+    return await this.searchAndPlayYoutubeMusic(songInfo)
+  }
+
+  private async searchAndPlayYoutubeMusic(
+    searchWordOrLink: string
+  ): Promise<MessageOptions['embeds']> {
+    this.logger.info('Buscando musica do youtube')
+    const result = await this.getYoutubeUrl(searchWordOrLink)
+
+    if (!result) {
+      this.discordCtx.sendDefaultMessage(
+        '`Não foi possível encontrar referencias`'
+      )
+      return
+    }
+
+    const { url } = result
+
+    return await this.playYouTubeMusic(url)
+  }
+
+  private async playYouTubeMusic(url: string) {
     const videoInfo = (await ytdl.getBasicInfo(url)).videoDetails
     const videoTitle = videoInfo.title
     const videoChannel = videoInfo.author.name
     const videoLengthSeconds = parseInt(videoInfo.lengthSeconds)
-    const totalMusicTime = this.getTotalMusicTime()
 
-    const logMessage = makeCardMusic({
+    return this.addSongAndBuildMessage({
       title: videoTitle,
       musicUrl: url,
-      positionInQueue: this.getSongManager().getListSong().length + 1,
-      timeUntilPlaying: totalMusicTime,
+      imageUrl: videoInfo.thumbnails[0].url,
       songDuration: videoLengthSeconds,
       youtubeChannelName: videoChannel,
-      imageUrl: videoInfo.thumbnails[0].url,
-      authorIconUrl: author.avatarURL({ size: 32 })
-    })
-
-    this.getSongManager().addSong({
-      url: url,
-      name: videoInfo.title,
-      duration: videoLengthSeconds,
-      userRequestName: author.username,
-      imageUrl: videoInfo.thumbnails[0].url,
       source: 'youtube'
     })
-    this.getSongManager().play()
-
-    return {
-      embeds: [logMessage]
-    }
   }
 
   private getTotalMusicTime() {
@@ -96,13 +128,8 @@ export class PlayMusicService {
     )
   }
 
-  async getYoutubeUrl(searchWordOrLink: string) {
+  private async getYoutubeUrl(searchWordOrLink: string) {
     this.logger.info(`Buscando por ${searchWordOrLink}`)
-
-    if (!searchWordOrLink) {
-      this.logger.warn('Não há dados para buscar')
-      return null
-    }
 
     if (ytdl.validateURL(searchWordOrLink)) {
       return {
@@ -111,10 +138,10 @@ export class PlayMusicService {
       }
     }
 
-    return await this.searchUrlYoutubeBySearch(searchWordOrLink)
+    return await this.findUrlYoutubeBySearch(searchWordOrLink)
   }
 
-  private async searchUrlYoutubeBySearch(search: string) {
+  private async findUrlYoutubeBySearch(search: string) {
     this.logger.info(`Buscando link do youtube com base em: ${search}`)
     const filters1 = await ytsr.getFilters(search)
     const filter1 = filters1.get('Type')?.get('Video')?.url
@@ -130,6 +157,35 @@ export class PlayMusicService {
       url,
       search
     }
+  }
+
+  private addSongAndBuildMessage(data: BuildMessage) {
+    this.discordCtx.sendDefaultMessage(
+      `:musical_note: Pesquisando :mag_right: \`${data.title}\``
+    )
+    const author = this.discordCtx.getMessage().author
+    const logMessage = makeCardMusic({
+      title: data.title,
+      musicUrl: data.musicUrl,
+      positionInQueue: this.getSongManager().getListSong().length + 1,
+      timeUntilPlaying: this.getTotalMusicTime(),
+      songDuration: data.songDuration,
+      youtubeChannelName: data.youtubeChannelName,
+      imageUrl: data.imageUrl,
+      authorIconUrl: author.avatarURL({ size: 32 })
+    })
+
+    this.getSongManager().addSong({
+      url: data.musicUrl,
+      name: data.title,
+      duration: data.songDuration,
+      userRequestName: author.username,
+      imageUrl: data.imageUrl,
+      source: data.source
+    })
+    this.getSongManager().play()
+
+    return [logMessage]
   }
 
   private getSongManager() {

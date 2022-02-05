@@ -48,9 +48,9 @@ export class CommandFactory {
     const content = this.discordService.getMessageContent()
     if (!params) return undefined
     if (!content && requiredParam) {
-      const msg = `É necessário os parâmetros: [ ${params
-        .map(({ name, description }) => description ?? name)
-        .join(', ')} ]`
+      const msg = `É necessário os parâmetros: [ ${
+        params.description ?? params.name
+      } ]`
       this.discordService.sendDefaultMessage(msg)
       this.discordService.sendDefaultMessage(
         `Verifique os comandos no \`${this.discordService.getBotPrefix()}help\``
@@ -60,18 +60,14 @@ export class CommandFactory {
 
     this.logger.info(`Construindo parâmetros de ${strategyName}`)
 
-    const regxPattern = new Array(params.length).fill('(.*)').join(' ')
+    const regxPattern = '(.*)'
     const regx = new RegExp(regxPattern, 'gi')
     const paramsPrimitive = regx.exec(content) ?? []
     paramsPrimitive.shift()
 
     this.logger.debug('Params encontrados: {}', paramsPrimitive)
 
-    const data = {}
-
-    params.forEach(({ name, type }, i) => {
-      data[name] = this.convertByType(type, paramsPrimitive[i])
-    })
+    const data = this.convertByType(params.type, paramsPrimitive[0])
 
     this.logger.info(
       'Parâmetros adicionado no {}: [ {} ]',

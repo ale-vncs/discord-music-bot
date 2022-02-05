@@ -8,7 +8,7 @@ import { MessageOptions } from 'discord.js'
 @Injectable()
 export abstract class AbstractCommandStrategy<T = any> {
   constructor(
-    private params: T,
+    private param: T,
     protected logger: LoggerAbstract,
     protected discordService: DiscordService,
     protected channelService: ChannelService,
@@ -39,7 +39,7 @@ export abstract class AbstractCommandStrategy<T = any> {
     this.discordService.sendEmbedMessage(embeds)
   }
 
-  protected getParams(): T {
-    return this.params
+  protected getParam(): T {
+    return this.param
   }
 }

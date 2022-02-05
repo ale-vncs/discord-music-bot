@@ -9,8 +9,9 @@ import { ContextUtil } from '@utils/context.util'
 import { SystemConfig } from '@config/system.config'
 import { InitializerService } from '@modules/initializer/initializer.service'
 
+const logger = new WinstonLoggerService()
+
 async function bootstrap() {
-  const logger = new WinstonLoggerService()
   const app = await NestFactory.create(AppModule, {
     logger
   })
@@ -38,5 +39,9 @@ async function bootstrap() {
     initializerService.start()
   })
 }
+
+process.on('uncaughtException', function (err) {
+  logger.error('[ {} ]: {}', err.name, err.message)
+})
 
 bootstrap().then()

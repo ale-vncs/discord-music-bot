@@ -1,12 +1,8 @@
 import { AbstractCommandStrategy } from './abstract-command.strategy'
 import { Injectable } from '@nestjs/common'
 
-interface PlayStrategyParams {
-  wordOrUrl: string
-}
-
 @Injectable()
-export class PlayStrategy extends AbstractCommandStrategy<PlayStrategyParams> {
+export class PlayStrategy extends AbstractCommandStrategy<string> {
   async init() {
     this.logger.setContext(PlayStrategy.name)
   }
@@ -14,8 +10,6 @@ export class PlayStrategy extends AbstractCommandStrategy<PlayStrategyParams> {
   async processMessage() {
     this.channelService.joinChannel()
 
-    await this.playMusicService.searchAndPlayYoutubeMusic(
-      this.getParams().wordOrUrl
-    )
+    await this.playMusicService.searchAndPlayMusic(this.getParam())
   }
 }

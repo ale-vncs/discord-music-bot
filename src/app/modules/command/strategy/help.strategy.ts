@@ -4,11 +4,7 @@ import { StrategyBuilder } from '@modules/command/strategy.builder'
 import { StrategyFactoryData } from '@typings/command-strategy.typing'
 import { Null, Undefined } from '@typings/generic.typing'
 
-interface HelpStrategyParams {
-  page: Null<number>
-}
-
-export class HelpStrategy extends AbstractCommandStrategy<HelpStrategyParams> {
+export class HelpStrategy extends AbstractCommandStrategy<Null<number>> {
   private prefix: string
 
   async init() {
@@ -49,15 +45,15 @@ export class HelpStrategy extends AbstractCommandStrategy<HelpStrategyParams> {
 
     aliasPrefixList.forEach((a, i, l) => {
       if (!params) return
-      const paramsNamelist = params.map((p) => `[${p.description ?? p.name}]`)
-      l[i] = `${a} ${paramsNamelist.join(' ')}`
+      const paramsNamelist = `[${params.description ?? params.name}]`
+      l[i] = `${a} ${paramsNamelist}`
     })
 
     return `\`${aliasPrefixList.join(' | ')}\``
   }
 
   private getPage() {
-    const { page } = this.getParams()
+    const page = this.getParam()
     if (page) return page - 1
     return 0
   }
