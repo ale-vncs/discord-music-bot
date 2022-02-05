@@ -3,10 +3,11 @@ import {
   createAudioPlayer,
   createAudioResource,
   NoSubscriberBehavior,
+  StreamType,
   VoiceConnection
 } from '@discordjs/voice'
 import { Readable } from 'stream'
-import ytdl from 'ytdl-core'
+import ytdl from 'discord-ytdl-core'
 import { CurrentSongData, SongData } from '@typings/queue.typing'
 import { Null, Undefined } from '@typings/generic.typing'
 import { StatusEnum } from '@enums/status.enum'
@@ -123,7 +124,9 @@ export class SongManagerService {
           dlChunkSize: 0
         })
 
-        const resource = createAudioResource(stream)
+        const resource = createAudioResource(stream, {
+          inputType: StreamType.Raw
+        })
 
         this.stream = stream
         this.logger.info(`Tocando musica: ${currentSong.name}`)
