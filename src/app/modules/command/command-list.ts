@@ -12,6 +12,7 @@ import { RemoveMusicStrategy } from '@modules/command/strategy/remove-music.stra
 import { RepeatStrategy } from '@modules/command/strategy/repeat.strategy'
 import { PlaylistStrategy } from '@modules/command/strategy/playlist.strategy'
 import { HelpStrategy } from '@modules/command/strategy/help.strategy'
+import { FilterStrategy } from '@modules/command/strategy/filter.strategy'
 
 const addCommand = StrategyBuilder.addCommand
 
@@ -90,6 +91,18 @@ addCommand({
   alias: ['playlist'],
   strategy: PlaylistStrategy,
   enabled: false
+})
+
+addCommand({
+  alias: ['f', 'filter'],
+  strategy: FilterStrategy,
+  description: 'Adiciona filtros na próxima músicas',
+  eg: ['nightcore', 'clear', 'list'],
+  params: {
+    name: 'filter',
+    type: 'string',
+    description: 'filtro'
+  }
 })
 
 addCommand({
