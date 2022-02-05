@@ -25,9 +25,10 @@ export class ChannelService {
 
     const userVoiceChannel = message.member?.voice.channel
     if (!userVoiceChannel) {
-      this.logger.error('Usuário não está em nenhum canal')
-      message.channel.send('É necessário está em um canal de voz')
-      return
+      const msg = 'Usuário não está em nenhum canal'
+      this.logger.error(msg)
+      this.discordCtx.sendDefaultMessage('É necessário está em um canal de voz')
+      throw new Error(msg)
     }
     const guild = this.songManager.getGuild()
 
