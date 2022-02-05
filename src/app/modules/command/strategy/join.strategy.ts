@@ -1,7 +1,5 @@
 import { AbstractCommandStrategy } from './abstract-command.strategy'
-import { Injectable } from '@nestjs/common'
 
-@Injectable()
 export class JoinStrategy extends AbstractCommandStrategy {
   async init() {
     this.logger.setContext(JoinStrategy.name)

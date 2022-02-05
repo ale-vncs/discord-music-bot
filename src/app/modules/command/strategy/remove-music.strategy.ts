@@ -1,7 +1,5 @@
 import { AbstractCommandStrategy } from './abstract-command.strategy'
-import { Injectable } from '@nestjs/common'
 
-@Injectable()
 export class RemoveMusicStrategy extends AbstractCommandStrategy<number> {
   async init() {
     this.logger.setContext(RemoveMusicStrategy.name)

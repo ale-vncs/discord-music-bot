@@ -13,6 +13,9 @@ import { RepeatStrategy } from '@modules/command/strategy/repeat.strategy'
 import { PlaylistStrategy } from '@modules/command/strategy/playlist.strategy'
 import { HelpStrategy } from '@modules/command/strategy/help.strategy'
 import { FilterStrategy } from '@modules/command/strategy/filter.strategy'
+import { FilterClearStrategy } from '@modules/command/strategy/filter-clear.strategy'
+import { FilterListStrategy } from '@modules/command/strategy/filter-list.strategy'
+import { FilterNowStrategy } from '@modules/command/strategy/filter-now.strategy'
 
 const addCommand = StrategyBuilder.addCommand
 
@@ -103,6 +106,24 @@ addCommand({
     type: 'string',
     description: 'filtro'
   }
+})
+
+addCommand({
+  alias: ['fc', 'filter-clear'],
+  strategy: FilterClearStrategy,
+  description: 'Limpa todos os filtros aplicados'
+})
+
+addCommand({
+  alias: ['fl', 'filter-list'],
+  strategy: FilterListStrategy,
+  description: 'Mostra todos os filtros disponíveis'
+})
+
+addCommand({
+  alias: ['fn', 'filter-now'],
+  strategy: FilterNowStrategy,
+  description: 'Mostra os filtros aplicados'
 })
 
 addCommand({
