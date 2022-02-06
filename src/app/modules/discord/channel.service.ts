@@ -18,10 +18,11 @@ export class ChannelService {
 
   joinChannel() {
     const message = this.discordCtx.getMessage()
-    if (this.songManager.getStatus() !== StatusEnum.IDLE) {
+    if (this.songManager.getIsInChannel()) {
       this.logger.warn('Já está em um canal')
       return
     }
+    this.songManager.setIsJoinChannel()
 
     const userVoiceChannel = message.member?.voice.channel
     if (!userVoiceChannel) {
@@ -45,7 +46,7 @@ export class ChannelService {
   }
 
   isJoinChannel() {
-    return this.songManager.getStatus() !== StatusEnum.IDLE
+    return this.songManager.getIsInChannel()
   }
 
   private get songManager() {
