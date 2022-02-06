@@ -15,6 +15,7 @@ import { Guild } from 'discord.js'
 import { LoggerAbstract } from '@logger/logger.abstract'
 import { Injectable } from '@nestjs/common'
 import { getEncoderByFilterList } from '@utils/filters.util'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 @Injectable()
 export class SongManagerService {
@@ -32,8 +33,12 @@ export class SongManagerService {
   private guild: Guild
   private repeatMode = false
   private encoderArgs: Undefined<string[]>
+  private isInChannel = false
 
-  constructor(private logger: LoggerAbstract) {
+  constructor(
+    private logger: LoggerAbstract,
+    private eventEmitter: EventEmitter2
+  ) {
     logger.setContext(SongManagerService.name)
     this.status = StatusEnum.IDLE
     this.stream = null
@@ -44,6 +49,8 @@ export class SongManagerService {
         noSubscriber: NoSubscriberBehavior.Pause
       }
     })
+
+    this.startIdleCounter()
 
     this.player.on('stateChange', (oldState, newState) => {
       if (oldState.status === 'playing' && newState.status === 'idle') {
@@ -76,6 +83,7 @@ export class SongManagerService {
   }
 
   disconnectVoice() {
+    this.isInChannel = false
     this.status = StatusEnum.IDLE
     this.clearSongList()
     this.stop()
@@ -199,6 +207,14 @@ export class SongManagerService {
     return this.guild
   }
 
+  setIsJoinChannel() {
+    this.isInChannel = true
+  }
+
+  getIsInChannel() {
+    return this.isInChannel
+  }
+
   private getEncoder() {
     return this.encoderArgs
       ? getEncoderByFilterList(this.encoderArgs)
@@ -206,9 +222,9 @@ export class SongManagerService {
   }
 
   private startIdleCounter() {
-    this.stop()
     this.idleCounter = setTimeout(() => {
       this.disconnectVoice()
+      this.eventEmitter.emit('song-manager.disconnect', this.getGuild().id)
       this.logger.info('Desconectado por inatividade')
     }, this.idleMaxTimeInSeconds * 1000)
   }

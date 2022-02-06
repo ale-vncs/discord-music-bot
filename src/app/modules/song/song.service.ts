@@ -3,6 +3,7 @@ import { SongManagerService } from '@modules/song/song-manager.service'
 import { QueueContextUtil } from '@utils/queue-context.util'
 import { Guild } from 'discord.js'
 import { ContextService } from '@context/context.service'
+import { OnEvent } from '@nestjs/event-emitter'
 
 @Injectable()
 export class SongService {
@@ -39,5 +40,10 @@ export class SongService {
     this.ctx.setDataContext('song', {
       currentSongManager: songManager
     })
+  }
+
+  @OnEvent('song-manager.disconnect')
+  private handleOrderCreatedEvent(guildId: string) {
+    this.removeSongManager(guildId)
   }
 }

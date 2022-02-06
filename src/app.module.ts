@@ -13,6 +13,7 @@ import { AllExceptionsFilter } from '@filters/all-exceptions.filter'
 import { InitializerModule } from '@modules/initializer/initializer.module'
 import { CommandModule } from '@modules/command/command.module'
 import { DiscordModule } from '@modules/discord/discord.module'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 
 @Module({
   controllers: [AppController],
@@ -25,6 +26,7 @@ import { DiscordModule } from '@modules/discord/discord.module'
     AppService
   ],
   imports: [
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       load: [systemConfig]
