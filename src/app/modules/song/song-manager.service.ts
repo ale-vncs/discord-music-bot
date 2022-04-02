@@ -32,8 +32,10 @@ export class SongManagerService {
   private status: StatusEnum
   private guild: Guild
   private repeatMode = false
+  private repeatListMode = false
   private encoderArgs: Undefined<string[]>
   private isInChannel = false
+  private currentSongId = 0
 
   constructor(private eventEmitter: EventEmitter2) {
     this.logger.setContext(SongManagerService.name)
@@ -52,7 +54,6 @@ export class SongManagerService {
         if (!this.repeatMode) {
           this.skip()
         } else {
-          this.stop()
           this.play()
         }
       }
@@ -84,15 +85,19 @@ export class SongManagerService {
     this.songs = []
   }
 
+  getCurrentSongId() {
+    return this.currentSongId
+  }
+
   getCurrentSong(): CurrentSongData {
     return {
-      ...this.songs[0],
+      ...this.songs[this.currentSongId],
       elapsedTime: this.elapsedTime
     }
   }
 
   getListSong() {
-    return this.songs
+    return [...this.songs]
   }
 
   addSong(song: SongData) {
@@ -112,15 +117,30 @@ export class SongManagerService {
     return this.encoderArgs
   }
 
+  previous() {
+    this.logger.info('Retornando para a música anterior')
+    this.previousSong()
+    this.replay()
+  }
+
+  jumpTo(songIndex: number) {
+    if (songIndex > this.songs.length) songIndex = this.songs.length
+    if (songIndex < 0) songIndex = 0
+    this.logger.info('Pulando para a música {}', songIndex + 1)
+
+    if (!this.repeatListMode) {
+      this.songs = this.songs.slice(songIndex)
+    } else {
+      this.currentSongId = songIndex
+    }
+
+    this.replay()
+  }
+
   skip() {
     this.logger.info('Pulando para a proxima música')
-    this.stop()
-    this.songs.shift()
-
-    this.status = StatusEnum.WAITING_MUSIC
-    this.stream = null
-
-    this.play()
+    this.nextSong()
+    this.replay()
   }
 
   play() {
@@ -128,7 +148,7 @@ export class SongManagerService {
       if (this.songs.length) {
         this.resetIdleCounter()
         this.resetTime()
-        const currentSong = this.songs[0]
+        const currentSong = this.songs[this.currentSongId]
 
         const stream = ytdl(currentSong.url, {
           filter: 'audioonly',
@@ -171,6 +191,11 @@ export class SongManagerService {
     this.player.stop()
   }
 
+  replay() {
+    this.stop()
+    this.play()
+  }
+
   pause() {
     this.status = StatusEnum.MUSIC_PAUSED
     this.player.pause()
@@ -183,6 +208,11 @@ export class SongManagerService {
 
   toggleRepeatMode() {
     this.repeatMode = !this.repeatMode
+  }
+
+  toggleRepeatListMode() {
+    this.repeatListMode = !this.repeatListMode
+    if (!this.repeatListMode) this.currentSongId = 0
   }
 
   getRepeatMode() {
@@ -210,6 +240,10 @@ export class SongManagerService {
     return this.isInChannel
   }
 
+  getIsRepeatListMode() {
+    return this.repeatListMode
+  }
+
   private getEncoder() {
     return this.encoderArgs
       ? getEncoderByFilterList(this.encoderArgs)
@@ -217,6 +251,7 @@ export class SongManagerService {
   }
 
   private startIdleCounter() {
+    if (this.idleCounter) this.resetIdleCounter()
     this.idleCounter = setTimeout(() => {
       this.disconnectVoice()
       this.eventEmitter.emit('song-manager.disconnect', this.getGuild().id)
@@ -231,5 +266,28 @@ export class SongManagerService {
   private resetTime() {
     this.elapsedTime = 0
     if (this.timeCounter) clearInterval(this.timeCounter)
+  }
+
+  private nextSong() {
+    if (!this.repeatListMode) {
+      this.songs.shift()
+    } else if (this.songs.length - 1 === this.currentSongId) {
+      this.currentSongId = 0
+    } else {
+      this.currentSongId++
+    }
+  }
+
+  private previousSong() {
+    if (!this.repeatListMode) {
+      const msg =
+        'Função de repetição de lista não ativado, então não é possivel retornar'
+      this.logger.error(msg)
+      throw new Error(msg)
+    } else if (this.currentSongId === 0) {
+      this.currentSongId = this.songs.length - 1
+    } else {
+      this.currentSongId--
+    }
   }
 }

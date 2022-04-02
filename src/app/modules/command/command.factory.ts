@@ -27,9 +27,9 @@ export class CommandFactory {
     const findCommand = list.find((c) => c.alias.includes(command))
 
     if (findCommand) {
-      const { strategy: Strategy, params, requiredParam } = findCommand
+      const { strategy: Strategy, params } = findCommand
       return new Strategy(
-        this.parseParam(params, Strategy.name, requiredParam),
+        this.parseParam(params, Strategy.name),
         this.logger,
         this.discordService,
         this.channelService,
@@ -42,12 +42,12 @@ export class CommandFactory {
 
   parseParam(
     params: Undefined<StrategyFactoryData['params']>,
-    strategyName: string,
-    requiredParam = true
+    strategyName: string
   ) {
     const content = this.discordService.getMessageContent()
     if (!params) return undefined
-    if (!content && requiredParam) {
+    if (!content && !params.required) return undefined
+    if (!content && params.required) {
       const msg = `É necessário os parâmetros: [ ${
         params.description ?? params.name
       } ]`
@@ -84,7 +84,8 @@ export class CommandFactory {
     }
 
     if (type && converter[type]) {
-      return converter[type](value)
+      value = converter[type](value)
+      this.checkConvert(type, value)
     }
 
     return value
@@ -92,5 +93,13 @@ export class CommandFactory {
 
   checkAlias() {
     this.strategyBuilder.checkSameAlias()
+  }
+
+  private checkConvert(type: StrategyParamType, value: any) {
+    if (type === 'number' && Number.isNaN(value)) {
+      const msg = 'O parametro não é um numero'
+      this.discordService.sendDefaultMessage(msg)
+      throw new Error(msg)
+    }
   }
 }
