@@ -8,8 +8,8 @@ export class RepeatStrategy extends AbstractCommandStrategy {
   async processMessage() {
     this.getSongManager().toggleRepeatMode()
     const msg = this.getSongManager().getRepeatMode()
-      ? 'Repetição ativada'
-      : 'Repetição desativada'
+      ? ':repeat_one: Repetição ativada :blue_circle:'
+      : ':repeat_one: Repetição desativada :red_circle:'
     this.sendMessage(msg)
   }
 }

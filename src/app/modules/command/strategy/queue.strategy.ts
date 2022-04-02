@@ -8,10 +8,12 @@ export class QueueStrategy extends AbstractCommandStrategy<Null<number>> {
   }
 
   async processMessage() {
-    const songlist = [...this.getSongManager().getListSong()]
+    const songManager = this.getSongManager()
+    const songlist = songManager.getListSong()
+    const currentSongId = songManager.getCurrentSongId()
     if (songlist.length) {
       const page = this.getPage()
-      this.sendEmbedMessage([makeCardSongList(songlist, page)])
+      this.sendEmbedMessage([makeCardSongList(songlist, page, currentSongId)])
     } else {
       this.sendMessage('Não há músicas')
     }

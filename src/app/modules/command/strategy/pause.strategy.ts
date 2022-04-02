@@ -9,7 +9,7 @@ export class PauseStrategy extends AbstractCommandStrategy {
   async processMessage() {
     if (this.getSongManager().getStatus() === StatusEnum.PLAYING) {
       this.getSongManager().pause()
-      this.sendMessage('Musica pausada')
+      this.sendMessage(':pause_button: Musica pausada')
     }
   }
 }

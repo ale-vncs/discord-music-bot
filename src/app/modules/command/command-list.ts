@@ -2,7 +2,7 @@ import { StrategyBuilder } from '@modules/command/strategy.builder'
 import { PlayStrategy } from '@modules/command/strategy/play.strategy'
 import { JoinStrategy } from '@modules/command/strategy/join.strategy'
 import { NowPlayingStrategy } from '@modules/command/strategy/now-playing.strategy'
-import { ForceSkipStrategy } from '@modules/command/strategy/force-skip.strategy'
+import { SkipStrategy } from '@modules/command/strategy/skip.strategy'
 import { PauseStrategy } from '@modules/command/strategy/pause.strategy'
 import { ResumeStrategy } from '@modules/command/strategy/resume.strategy'
 import { DisconnectStrategy } from '@modules/command/strategy/disconnect.strategy'
@@ -16,33 +16,47 @@ import { FilterStrategy } from '@modules/command/strategy/filter.strategy'
 import { FilterClearStrategy } from '@modules/command/strategy/filter-clear.strategy'
 import { FilterListStrategy } from '@modules/command/strategy/filter-list.strategy'
 import { FilterNowStrategy } from '@modules/command/strategy/filter-now.strategy'
+import { RepeatListStrategy } from '@modules/command/strategy/repeat-list.strategy'
+import { ReplayStrategy } from '@modules/command/strategy/replay.strategy'
+import { PreviousStrategy } from '@modules/command/strategy/previous.strategy'
+import { JumpToStrategy } from '@modules/command/strategy/jump-to.strategy'
 
 const addCommand = StrategyBuilder.addCommand
+
+addCommand({
+  alias: ['h', 'help'],
+  strategy: HelpStrategy,
+  description: 'Lista de comando do Ricardo Music',
+  eg: ['', '1', '2'],
+  params: {
+    name: 'page',
+    type: 'number',
+    description: 'página'
+  }
+})
 
 addCommand({
   alias: ['play', 'p'],
   strategy: PlayStrategy,
   description: 'Toca a música ou adiciona na lista',
-  requiredParam: true,
-  params: { name: 'wordOrUrl', description: 'nome-ou-url-youtube' }
+  params: {
+    name: 'wordOrUrl',
+    description: 'nome-ou-url-youtube',
+    required: true
+  }
 })
 
 addCommand({
-  alias: ['join'],
-  strategy: JoinStrategy,
-  description: 'Convida o Ricardo para entrar na sua sala atual'
-})
-
-addCommand({
-  alias: ['np', 'now-playing'],
-  strategy: NowPlayingStrategy,
-  description: 'Mostra informações da música atual'
-})
-
-addCommand({
-  alias: ['fs', 'force-skip'],
-  strategy: ForceSkipStrategy,
+  alias: ['s', 'skip', 'next'],
+  strategy: SkipStrategy,
   description: 'Pula para a próxima música'
+})
+
+addCommand({
+  alias: ['pv', 'previous', 'prev'],
+  strategy: PreviousStrategy,
+  description:
+    'Retorna para a música anterior quando a repetição de lista está ativada'
 })
 
 addCommand({
@@ -58,17 +72,46 @@ addCommand({
 })
 
 addCommand({
+  alias: ['jump-to', 'jt'],
+  strategy: JumpToStrategy,
+  description: 'Pular para a música selecionada',
+  eg: ['1', '2'],
+  params: {
+    name: 'songIndex',
+    description: 'posição-da-musica-na-lista',
+    type: 'number',
+    required: true
+  }
+})
+
+addCommand({
   alias: ['dc', 'disconnect'],
   strategy: DisconnectStrategy,
   description: 'Desconecta o Ricardo da sala'
 })
 
 addCommand({
+  alias: ['join'],
+  strategy: JoinStrategy,
+  description: 'Convida o Ricardo para entrar na sua sala atual'
+})
+
+addCommand({
+  alias: ['np', 'now-playing'],
+  strategy: NowPlayingStrategy,
+  description: 'Mostra informações da música atual'
+})
+
+addCommand({
   alias: ['q', 'queue'],
   strategy: QueueStrategy,
   description: 'Lista as músicas que estão na lista',
-  requiredParam: false,
-  params: { name: 'page', description: 'página', type: 'number' }
+  eg: ['', '1', '2'],
+  params: {
+    name: 'page',
+    description: 'página',
+    type: 'number'
+  }
 })
 
 addCommand({
@@ -85,22 +128,28 @@ addCommand({
 })
 
 addCommand({
-  alias: ['repeat'],
+  alias: ['repeat', 'rp'],
   strategy: RepeatStrategy,
-  description: 'Ativa e desativa repetição da música atual'
+  description: 'Ativa ou desativa repetição da música atual'
 })
 
 addCommand({
-  alias: ['playlist'],
-  strategy: PlaylistStrategy,
-  enabled: false
+  alias: ['rpl', 'repeat-list'],
+  strategy: RepeatListStrategy,
+  description: 'Ativa ou desativa a repetição da lista'
+})
+
+addCommand({
+  alias: ['r', 'replay'],
+  strategy: ReplayStrategy,
+  description: 'Retoca a música atual do inicio'
 })
 
 addCommand({
   alias: ['f', 'filter'],
   strategy: FilterStrategy,
   description: 'Adiciona filtros na próxima músicas',
-  eg: ['nightcore', 'clear', 'list'],
+  eg: ['nightcore', 'fadein', 'bassboost', 'fadein bassboost'],
   params: {
     name: 'filter',
     type: 'string',
@@ -127,9 +176,7 @@ addCommand({
 })
 
 addCommand({
-  alias: ['h', 'help'],
-  strategy: HelpStrategy,
-  description: 'Lista de comando do Ricardo Music',
-  requiredParam: false,
-  params: { name: 'page', type: 'number', description: 'página' }
+  alias: ['playlist'],
+  strategy: PlaylistStrategy,
+  enabled: false
 })

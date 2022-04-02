@@ -56,7 +56,7 @@ const makeCardHelp = (commandDescription: string[], currentPage = 0) => {
   const { amountPage, pageSize, offset, page } = calculatePagination(
     commandDescription,
     currentPage,
-    5
+    10
   )
   const description: string[] = []
 
@@ -69,7 +69,7 @@ const makeCardHelp = (commandDescription: string[], currentPage = 0) => {
     color: '#e75454',
     description: buildDescription(description),
     footer: {
-      text: `Página ${page + 1}/${amountPage}`
+      text: `Página ${page}/${amountPage}`
     }
   }
 
@@ -101,20 +101,24 @@ const makeCardNowPlaying = (data: CurrentSongData) => {
   return logMessage
 }
 
-const makeCardSongList = (data: SongData[], currentPage = 0) => {
+const makeCardSongList = (
+  data: SongData[],
+  currentPage = 0,
+  currentSongId = 0
+) => {
   const { amountPage, amountData, pageSize, offset, page } =
     calculatePagination(data, currentPage)
-  const description: string[] = [buildMusicDetail(data[0])]
+  const currentSong = data[currentSongId]
+  const description: string[] = [buildMusicDetail(currentSong)]
   const amountSong = amountData
   const totalTimeOfSong = data.reduce((sum, song) => sum + song.duration, 0)
 
-  data.shift()
   data.splice(offset, pageSize).forEach((song, index) => {
     description.push(buildMusicDetail(song, index + offset))
   })
 
   description.push(
-    `${amountSong} músicas na fila :: total ${secondsToDisplayTime(
+    `${amountSong} músicas na lista :: total ${secondsToDisplayTime(
       totalTimeOfSong
     )}`
   )
@@ -122,12 +126,12 @@ const makeCardSongList = (data: SongData[], currentPage = 0) => {
   const logMessage: MessageEmbedOptions = {
     title: 'Lista de músicas',
     color: '#d4cc16',
-    author: {
-      name: 'Tocando agora'
+    thumbnail: {
+      url: currentSong.imageUrl
     },
     description: buildDescription(description),
     footer: {
-      text: `Página ${page + 1}/${amountPage}`
+      text: `Página ${page}/${amountPage}`
     }
   }
 
@@ -143,7 +147,7 @@ const buildMusicDetail = (song: SongData, index?: number) => {
   const buildDescription: string[] = []
   if (index !== undefined) {
     if (index === 0) {
-      buildDescription.push('Na fila:\n')
+      buildDescription.push('Na lista:\n')
     }
     buildDescription.push(`\`${index + 1}.\``)
   } else {
@@ -151,12 +155,9 @@ const buildMusicDetail = (song: SongData, index?: number) => {
   }
   buildDescription.push(`[${song.name}](${song.url})`)
   buildDescription.push(' :: ')
-  buildDescription.push('')
-  buildDescription.push(
-    `\`${secondsToDisplayTime(song.duration)} Adicionado por: ${
-      song.userRequestName
-    }\``
-  )
+  buildDescription.push(secondsToDisplayTime(song.duration))
+  buildDescription.push('\n')
+  buildDescription.push(`\`Adicionado por: ${song.userRequestName}\``)
   return buildDescription.join('')
 }
 
@@ -175,10 +176,11 @@ const buildProgressBar = (currentTime: number, endTime: number) => {
 }
 
 const calculatePagination = (data: any[], page: number, pageSize = 10) => {
-  const amountPage = Math.ceil((data.length - 1) / pageSize)
   const amountData = data.length
-  if (page + 1 > amountPage) page = amountPage - 1
-  const offset = page * pageSize
+  const amountPage = Math.ceil(amountData / pageSize)
+  page++
+  if (page > amountPage) page = amountPage - 1
+  const offset = (page - 1) * pageSize
 
   return {
     amountPage,
