@@ -6,17 +6,15 @@ import { AppContextType, ContextKeys } from '@typings/context.typings'
 
 export class ContextUtil {
   private static instance: ContextUtil
-  private ns: Namespace
+  private readonly ns: Namespace
 
   private constructor() {
     this.ns = createNamespace(uuidV4())
+    ContextUtil.instance = this
   }
 
   static getInstance() {
-    if (!ContextUtil.instance) {
-      ContextUtil.instance = new ContextUtil()
-    }
-    return ContextUtil.instance
+    return ContextUtil.instance ?? new ContextUtil()
   }
 
   changeContext(namespace: AppContextType, cb: () => void) {

@@ -40,8 +40,4 @@ async function bootstrap() {
   })
 }
 
-process.on('uncaughtException', function (err) {
-  logger.error('[ {} ]: {}', err.name, err.message)
-})
-
 bootstrap().then()

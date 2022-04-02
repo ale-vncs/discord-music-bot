@@ -53,7 +53,7 @@
     "uuid": "8.3.2",
     "winston": "3.3.3",
     "winston-daily-rotate-file": "^4.5.5",
-    "ytdl-core": "^4.10.1",
+    "ytdl-core": "^4.11.0",
     "ytsr": "3.6.0"
   },
   "devDependencies": {

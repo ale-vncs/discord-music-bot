@@ -51,13 +51,11 @@ export class ClientService {
     this.client.on(event, cb)
   }
 
-  login(cb?: () => void) {
+  async login() {
     this.logger.info('Logando bot...')
-    this.client.login(this.ctx.getConfig('discord')?.token).then((msg) => {
-      this.logger.debug(msg)
-      this.logger.info(`Bot logado com sucesso, aguardando mensagens...`)
-      this.botIsReady = true
-      cb?.()
-    })
+    const msg = await this.client.login(this.ctx.getConfig('discord')?.token)
+    this.logger.debug(msg)
+    this.logger.info(`Bot logado com sucesso, aguardando mensagens...`)
+    this.botIsReady = true
   }
 }

@@ -22,7 +22,7 @@ export class CommandsService {
     strategyFactory.checkAlias()
   }
 
-  processMessage(message: Message) {
+  async processMessage(message: Message) {
     this.message = message
     if (this.isBotMessageAndIgnore()) return
     const { content } = message
@@ -36,7 +36,7 @@ export class CommandsService {
     const command = this.getCommandStrategyOrUndefined(commandAlias)
     const queue = this.getQueueByGuild()
     this.songService.setSongManagerInContext(queue)
-    this.executeCommand(command)
+    await this.executeCommand(command)
   }
 
   private async executeCommand(command: AbstractCommandStrategy) {
@@ -47,7 +47,7 @@ export class CommandsService {
 
   private getCommandAlias(prefix: string) {
     const command = this.message.content.split(' ')[0].replace(prefix, '')
-    this.logger.info(`Comando encontrado: ${command}`)
+    this.logger.info(`Comando: ${command}`)
     return command
   }
 
