@@ -13,15 +13,19 @@ export class QueueContextUtil {
     return QueueContextUtil.instance ?? new QueueContextUtil()
   }
 
-  addSongManager(key: string, service: SongManagerService) {
-    this.listQueue.set(key, service)
+  addSongManager(guildId: string, service: SongManagerService) {
+    this.listQueue.set(guildId, service)
   }
 
-  getQueueOrUndefinedByKey(key: string) {
-    return this.listQueue.get(key)
+  getQueueOrUndefinedByKey(guildId: string) {
+    return this.listQueue.get(guildId)
   }
 
   removeSongManager(key: string) {
     this.listQueue.delete(key)
+  }
+
+  getListKey() {
+    return Array.from(this.listQueue.keys())
   }
 }

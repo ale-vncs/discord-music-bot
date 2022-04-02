@@ -22,7 +22,6 @@ export class ChannelService {
       this.logger.warn('Já está em um canal')
       return
     }
-    this.songManager.setIsJoinChannel()
 
     const userVoiceChannel = message.member?.voice.channel
     if (!userVoiceChannel) {
@@ -31,6 +30,7 @@ export class ChannelService {
       this.discordCtx.sendDefaultMessage('É necessário está em um canal de voz')
       throw new Error(msg)
     }
+    this.songManager.setIsJoinChannel()
     const guild = this.songManager.getGuild()
 
     this.logger.info(`Entrando no canal: ${userVoiceChannel.name}`)

@@ -15,11 +15,12 @@ export class InitializerService {
     logger.setContext(InitializerService.name)
   }
 
-  start() {
-    this.clientService.login(() => {
-      this.clientService.addEventOn('messageCreate', async (message) => {
-        this.ctx.changeContext('bot', () => {
-          this.commandService.processMessage(message)
+  async start() {
+    await this.clientService.login()
+    this.clientService.addEventOn('messageCreate', async (message) => {
+      this.ctx.changeContext('bot', () => {
+        this.commandService.processMessage(message).catch((err) => {
+          this.logger.error('Um error ocorreu ao processar mensagem: {}', err)
         })
       })
     })

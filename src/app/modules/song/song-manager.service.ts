@@ -12,13 +12,13 @@ import { CurrentSongData, SongData } from '@typings/queue.typing'
 import { Null, Undefined } from '@typings/generic.typing'
 import { StatusEnum } from '@enums/status.enum'
 import { Guild } from 'discord.js'
-import { LoggerAbstract } from '@logger/logger.abstract'
-import { Injectable } from '@nestjs/common'
 import { getEncoderByFilterList } from '@utils/filters.util'
 import { EventEmitter2 } from '@nestjs/event-emitter'
+import { WinstonLoggerService } from '@logger/winston-logger.service'
 
-@Injectable()
 export class SongManagerService {
+  private logger = new WinstonLoggerService()
+
   private timeCounter: Undefined<NodeJS.Timer>
   private idleCounter: Undefined<NodeJS.Timer>
 
@@ -35,11 +35,8 @@ export class SongManagerService {
   private encoderArgs: Undefined<string[]>
   private isInChannel = false
 
-  constructor(
-    private logger: LoggerAbstract,
-    private eventEmitter: EventEmitter2
-  ) {
-    logger.setContext(SongManagerService.name)
+  constructor(private eventEmitter: EventEmitter2) {
+    this.logger.setContext(SongManagerService.name)
     this.status = StatusEnum.IDLE
     this.stream = null
     this.encoderArgs = undefined
@@ -49,8 +46,6 @@ export class SongManagerService {
         noSubscriber: NoSubscriberBehavior.Pause
       }
     })
-
-    this.startIdleCounter()
 
     this.player.on('stateChange', (oldState, newState) => {
       if (oldState.status === 'playing' && newState.status === 'idle') {
@@ -62,11 +57,6 @@ export class SongManagerService {
         }
       }
     })
-  }
-
-  init(guild: Guild) {
-    this.guild = guild
-    return this
   }
 
   getStatus() {
@@ -207,7 +197,12 @@ export class SongManagerService {
     return this.guild
   }
 
+  setGuild(guild: Guild) {
+    this.guild = guild
+  }
+
   setIsJoinChannel() {
+    this.startIdleCounter()
     this.isInChannel = true
   }
 
