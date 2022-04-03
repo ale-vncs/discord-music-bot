@@ -24,6 +24,9 @@ interface BuildMessage {
 
 @Injectable()
 export class PlayMusicService {
+  private unknownImage =
+    'https://www.google.com.br/url?sa=i&url=https%3A%2F%2Fscroll.morele.net%2Ftechnologia%2Fapple-music-doczeka-sie-zmian-sugeruje-to-nowy-zakup-firmy-tima-cooka%2F&psig=AOvVaw1f4YfyCNt4WH1JCriShL--&ust=1649077690545000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCLjSlK779_YCFQAAAAAdAAAAABAJ'
+
   constructor(
     private logger: LoggerAbstract,
     private discordCtx: DiscordService
@@ -106,10 +109,14 @@ export class PlayMusicService {
     const videoChannel = videoInfo.author.name
     const videoLengthSeconds = parseInt(videoInfo.lengthSeconds)
 
+    this.logger.debug('Video info: {}', JSON.stringify(videoInfo))
+
     return this.addSongAndBuildMessage({
       title: videoTitle,
       musicUrl: url,
-      imageUrl: videoInfo.thumbnails[0].url,
+      imageUrl: videoInfo.thumbnails.length
+        ? videoInfo.thumbnails[0].url
+        : this.unknownImage,
       songDuration: videoLengthSeconds,
       youtubeChannelName: videoChannel,
       source: 'youtube'
@@ -160,6 +167,7 @@ export class PlayMusicService {
   }
 
   private addSongAndBuildMessage(data: BuildMessage) {
+    const songManager = this.getSongManager()
     this.discordCtx.sendDefaultMessage(
       `:musical_note: Pesquisando :mag_right: \`${data.title}\``
     )
@@ -167,7 +175,7 @@ export class PlayMusicService {
     const logMessage = makeCardMusic({
       title: data.title,
       musicUrl: data.musicUrl,
-      positionInQueue: this.getSongManager().getListSong().length + 1,
+      positionInQueue: songManager.getListSong().length + 1,
       timeUntilPlaying: this.getTotalMusicTime(),
       songDuration: data.songDuration,
       youtubeChannelName: data.youtubeChannelName,
@@ -175,7 +183,7 @@ export class PlayMusicService {
       authorIconUrl: author.avatarURL({ size: 32 })
     })
 
-    this.getSongManager().addSong({
+    songManager.addSong({
       url: data.musicUrl,
       name: data.title,
       duration: data.songDuration,
@@ -183,7 +191,7 @@ export class PlayMusicService {
       imageUrl: data.imageUrl,
       source: data.source
     })
-    this.getSongManager().play()
+    songManager.play()
 
     return [logMessage]
   }

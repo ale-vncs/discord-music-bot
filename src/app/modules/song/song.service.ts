@@ -3,23 +3,18 @@ import { SongManagerService } from '@modules/song/song-manager.service'
 import { QueueContextUtil } from '@utils/queue-context.util'
 import { Guild } from 'discord.js'
 import { ContextService } from '@context/context.service'
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { LoggerAbstract } from '@logger/logger.abstract'
 
 @Injectable()
 export class SongService {
   private queueCtx = QueueContextUtil.getInstance()
 
-  constructor(
-    private logger: LoggerAbstract,
-    private eventEmitter: EventEmitter2,
-    private ctx: ContextService
-  ) {
+  constructor(private logger: LoggerAbstract, private ctx: ContextService) {
     logger.setContext(SongService.name)
   }
 
   createSongManager(guild: Guild) {
-    const songManager = new SongManagerService(this.eventEmitter)
+    const songManager = new SongManagerService()
     songManager.setGuild(guild)
     return songManager
   }
@@ -41,12 +36,7 @@ export class SongService {
   getCurrentSongManager() {
     const songCtx = this.ctx.getDataContext('song')
     if (songCtx) {
-      const songManager = songCtx.currentSongManager
-      this.logger.debug(
-        'SongManager da guild id: {}',
-        songManager.getGuild().id
-      )
-      return songManager
+      return songCtx.currentSongManager
     }
     throw new Error('Sem SongManager no contexto')
   }
@@ -55,10 +45,5 @@ export class SongService {
     this.ctx.setDataContext('song', {
       currentSongManager: songManager
     })
-  }
-
-  @OnEvent('song-manager.disconnect')
-  private handleOrderCreatedEvent(guildId: string) {
-    this.removeSongManager(guildId)
   }
 }

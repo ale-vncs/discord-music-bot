@@ -53,7 +53,7 @@ export class DiscordService {
   }
 
   isIgnoreBotMessage() {
-    return this.ctx.getConfig('discord')?.ignoreBotMessage ?? false
+    return this.ctx.getConfig('discord')?.ignoreBotMessage ?? true
   }
 
   private getDiscord() {

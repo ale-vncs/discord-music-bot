@@ -13,7 +13,6 @@ import { Null, Undefined } from '@typings/generic.typing'
 import { StatusEnum } from '@enums/status.enum'
 import { Guild } from 'discord.js'
 import { getEncoderByFilterList } from '@utils/filters.util'
-import { EventEmitter2 } from '@nestjs/event-emitter'
 import { WinstonLoggerService } from '@logger/winston-logger.service'
 
 export class SongManagerService {
@@ -37,7 +36,7 @@ export class SongManagerService {
   private isInChannel = false
   private currentSongId = 0
 
-  constructor(private eventEmitter: EventEmitter2) {
+  constructor() {
     this.logger.setContext(SongManagerService.name)
     this.status = StatusEnum.IDLE
     this.stream = null
@@ -50,7 +49,11 @@ export class SongManagerService {
     })
 
     this.player.on('stateChange', (oldState, newState) => {
-      if (oldState.status === 'playing' && newState.status === 'idle') {
+      if (
+        oldState.status === 'playing' &&
+        newState.status === 'idle' &&
+        this.isInChannel
+      ) {
         if (!this.repeatMode) {
           this.skip()
         } else {
@@ -75,14 +78,17 @@ export class SongManagerService {
 
   disconnectVoice() {
     this.isInChannel = false
-    this.status = StatusEnum.IDLE
     this.clearSongList()
-    this.stop()
-    if (this.voiceChannel) return this.voiceChannel.disconnect()
+    this.player.removeAllListeners('stateChange')
+    this.player.removeAllListeners('error')
+    this.player.stop(true)
+    this.status = StatusEnum.IDLE
+    this.voiceChannel?.disconnect()
   }
 
   clearSongList() {
     this.songs = []
+    this.currentSongId = 0
   }
 
   getCurrentSongId() {
@@ -135,6 +141,18 @@ export class SongManagerService {
     }
 
     this.replay()
+  }
+
+  removeByIndex(songIndex: number) {
+    if (songIndex > this.songs.length || songIndex < 0) {
+      throw new Error(`O index ${songIndex} não corresponde a lista de música`)
+    }
+    if (songIndex === this.currentSongId) {
+      throw new Error('Não pode remover a música atual')
+    }
+    const removeSong = this.songs[songIndex]
+    this.songs.splice(songIndex, 1)
+    return removeSong
   }
 
   skip() {
@@ -212,7 +230,10 @@ export class SongManagerService {
 
   toggleRepeatListMode() {
     this.repeatListMode = !this.repeatListMode
-    if (!this.repeatListMode) this.currentSongId = 0
+    if (!this.repeatListMode) {
+      this.songs = this.songs.slice(this.currentSongId)
+      this.currentSongId = 0
+    }
   }
 
   getRepeatMode() {
@@ -254,7 +275,6 @@ export class SongManagerService {
     if (this.idleCounter) this.resetIdleCounter()
     this.idleCounter = setTimeout(() => {
       this.disconnectVoice()
-      this.eventEmitter.emit('song-manager.disconnect', this.getGuild().id)
       this.logger.info('Desconectado por inatividade')
     }, this.idleMaxTimeInSeconds * 1000)
   }
