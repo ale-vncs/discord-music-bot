@@ -1,6 +1,9 @@
 export const getEncoderByFilterList = (filters: string[]) => {
   const list = ['-af']
-  const enc = filters.map((f) => filterList()[f]).join(',')
+  const filtersAvailable = filterList()
+  const enc = filters
+    .map((f: keyof typeof filtersAvailable) => filtersAvailable[f])
+    .join(',')
   list.push(enc)
   return list
 }

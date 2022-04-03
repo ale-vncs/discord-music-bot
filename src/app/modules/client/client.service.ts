@@ -20,6 +20,13 @@ export class ClientService {
       ]
     })
 
+    this.client.on('voiceStateUpdate', (e) => {
+      if (e.channel?.members.size === 1) {
+        // TODO: desconectar quando não tiver ninguém na sala
+        // e.channel.members.find((f) => f.user.bot)?.voice.disconnect()
+      }
+    })
+
     this.client.once('ready', (e) => {
       this.logger.log('Ready!')
       e.user.setPresence({
