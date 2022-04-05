@@ -153,7 +153,8 @@ addCommand({
   params: {
     name: 'filter',
     type: 'string',
-    description: 'filtro'
+    description: 'filtro',
+    required: true
   }
 })
 

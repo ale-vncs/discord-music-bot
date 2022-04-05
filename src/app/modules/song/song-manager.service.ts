@@ -48,6 +48,8 @@ export class SongManagerService {
       }
     })
 
+    this.player.setMaxListeners(2)
+
     this.player.on('stateChange', (oldState, newState) => {
       if (
         oldState.status === 'playing' &&
@@ -60,6 +62,13 @@ export class SongManagerService {
           this.play()
         }
       }
+    })
+
+    this.player.on('error', (d) => {
+      this.logger.error('Error ao tocar musica: {}', this.getCurrentSong().name)
+      this.logger.error('[ {} ]: {}', d.name, d.message)
+      this.resetTime()
+      this.skip()
     })
   }
 
@@ -79,8 +88,6 @@ export class SongManagerService {
   disconnectVoice() {
     this.isInChannel = false
     this.clearSongList()
-    this.player.removeAllListeners('stateChange')
-    this.player.removeAllListeners('error')
     this.player.stop(true)
     this.status = StatusEnum.IDLE
     this.voiceChannel?.disconnect()
@@ -189,13 +196,6 @@ export class SongManagerService {
             this.elapsedTime++
           }
         }, 1000)
-
-        this.player.on('error', (d) => {
-          this.logger.error('Error ao tocar musica: {}', currentSong.name)
-          this.logger.error('[ {} ]: {}', d.name, d.message)
-          this.resetTime()
-          this.skip()
-        })
       } else {
         this.logger.info('A fila está vazia!')
         this.startIdleCounter()
