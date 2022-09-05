@@ -22,8 +22,8 @@
     "migration": "dotenv -e .env -- flyway -configFiles=flyway.conf migrate"
   },
   "dependencies": {
-    "@discordjs/opus": "0.7.0",
-    "@discordjs/voice": "0.7.5",
+    "@discordjs/opus": "0.8.0",
+    "@discordjs/voice": "0.11.0",
     "@nestjs/common": "8.2.5",
     "@nestjs/config": "1.1.5",
     "@nestjs/core": "8.2.5",
@@ -53,11 +53,11 @@
     "uuid": "8.3.2",
     "winston": "3.3.3",
     "winston-daily-rotate-file": "^4.5.5",
-    "ytdl-core": "^4.11.0",
+    "ytdl-core": "^4.11.2",
     "ytsr": "3.6.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "8.2.0",
+    "@nestjs/cli": "8.2.8",
     "@nestjs/schematics": "8.0.5",
     "@nestjs/testing": "8.2.5",
     "@types/cls-hooked": "4.3.3",
