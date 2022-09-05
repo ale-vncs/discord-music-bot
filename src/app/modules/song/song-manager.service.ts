@@ -59,7 +59,7 @@ export class SongManagerService {
         if (!this.repeatMode) {
           this.skip()
         } else {
-          this.play()
+          this.replay()
         }
       }
     })
