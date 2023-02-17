@@ -3,6 +3,7 @@ import ytdl from 'ytdl-core'
 import { makeCardMusic } from '@utils/card-messages.util'
 import ytsr from 'ytsr'
 import spotify from 'spotify-url-info'
+import fetch from 'isomorphic-unfetch'
 import { Injectable } from '@nestjs/common'
 import { LoggerAbstract } from '@logger/logger.abstract'
 import { DiscordService } from '@modules/discord/discord.service'
@@ -78,7 +79,7 @@ export class PlayMusicService {
     link: string
   ): Promise<MessageOptions['embeds']> {
     this.logger.info('Buscando musica do spotify')
-    const songData = await spotify.getPreview(link)
+    const songData = await spotify(fetch).getPreview(link)
 
     const songInfo = `${songData.title} - ${songData.artist}`
 
